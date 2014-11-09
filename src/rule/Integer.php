@@ -27,14 +27,24 @@ class Integer extends \sndsgd\field\Rule
       Collection $collection = null
    )
    {
-      if (
-         $value !== null &&
-         filter_var($value, FILTER_VALIDATE_INT) &&
-         is_bool($value) === false
-      ) {
-         return intval($value);
-      }
-      return new ValidationError($this->message, $value, $name, $index);
+      return (
+         is_bool($value) || 
+         $value === null ||
+         ($newVal = filter_var($value, FILTER_VALIDATE_INT)) === false
+      ) 
+         ? new ValidationError($this->message, $value, $name, $index)
+         : $newVal;
+
+      
+      //    $value === 0 || (
+      //       $value !== null &&
+      //        &&
+      //       is_bool($value) === false
+      //    )
+      // ) {
+      //    return intval($value);
+      // }
+      // return ;
    }
 }
 

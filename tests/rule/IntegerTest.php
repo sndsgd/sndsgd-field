@@ -10,7 +10,7 @@ class IntegerTest extends \PHPUnit_Framework_TestCase
    public function testDateString()
    {
       $rule = new Integer;
-      #$this->assertEquals(0, $rule->validate(0));
+      $this->assertEquals(0, $rule->validate(0));
       $this->assertEquals(42, $rule->validate(42));
       $this->assertEquals(42, $rule->validate('42'));
       $this->assertEquals(-42, $rule->validate(-42));
