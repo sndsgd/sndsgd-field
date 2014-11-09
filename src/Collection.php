@@ -33,6 +33,13 @@ class Collection extends \sndsgd\util\EventTarget
    protected $validationErrors = null;
 
    /**
+    * Store data that required expensive operations to get
+    *
+    * @var array.<string,mixed>
+    */
+   protected $data = [];
+
+   /**
     * Define a field
     * 
     * @param sndsgd\field\Field $field The field to define
@@ -134,6 +141,39 @@ class Collection extends \sndsgd\util\EventTarget
             }
          }
       }
+   }
+
+
+   /**
+    * Stash data in this object
+    *
+    * Helpful when performing expensive operations during validation on data
+    * that will be required later in the script
+    * @param string $key The name to stash data under
+    * @param mixed $value Whatever needs to be stashed
+    * @return void
+    */
+   public function addData($key, $value)
+   {
+      $this->data[$key] = $value;
+   }
+
+   /**
+    * Retrieve data from this object
+    *
+    * @param string $key The name to stash data under
+    * @param mixed $value Whatever needs to be stashed
+    * @return void
+    */
+   public function getData($key = null)
+   {
+      if ($key === null) {
+         return $this->data;
+      }
+      else if (!array_key_exists($key, $this->data)) {
+         return null;
+      }
+      return $this->data[$key];
    }
 
    /**

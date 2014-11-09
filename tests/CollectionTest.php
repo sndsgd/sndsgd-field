@@ -70,6 +70,29 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
       }
    }
 
+   public function testSetGetData()
+   {
+      $this->coll->addData('one', 1);
+      $this->coll->addData('two', '2');
+      $obj = new \StdClass;
+      $this->coll->addData('obj', $obj);
+
+      $this->assertEquals(1, $this->coll->getData('one'));
+      $this->assertEquals('2', $this->coll->getData('two'));
+      $this->assertEquals($obj, $this->coll->getData('obj'));
+
+      # get non existing value
+      $this->assertNull($this->coll->getData('doesnt-exist'));
+
+      # get all data
+      $this->assertEquals([
+         'one' => 1,
+         'two' => 2,
+         'obj' => $obj
+      ], $this->coll->getData());
+   }
+
+
    public function testValidationEvents()
    {
       $beforeValidate = \Closure::bind(function(Collection $collection) {
