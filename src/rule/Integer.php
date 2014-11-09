@@ -34,17 +34,6 @@ class Integer extends \sndsgd\field\Rule
       ) 
          ? new ValidationError($this->message, $value, $name, $index)
          : $newVal;
-
-      
-      //    $value === 0 || (
-      //       $value !== null &&
-      //        &&
-      //       is_bool($value) === false
-      //    )
-      // ) {
-      //    return intval($value);
-      // }
-      // return ;
    }
 }
 
