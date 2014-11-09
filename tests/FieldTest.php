@@ -160,6 +160,12 @@ class FieldTest extends \PHPUnit_Framework_TestCase
       $this->assertEquals([43,11], $this->field->exportValue());
    }
 
+   public function testHasValue()
+   {
+      $this->assertFalse($this->field->hasValue());
+      $this->field->addValue(10);
+      $this->assertTrue($this->field->hasValue());
+   }
 
    public function testGetValue()
    {

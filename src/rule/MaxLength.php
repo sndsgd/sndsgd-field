@@ -5,7 +5,6 @@ namespace sndsgd\field\rule;
 use \InvalidArgumentException;
 use \sndsgd\field\Collection;
 use \sndsgd\field\ValidationError;
-use \sndsgd\util\Str;
 
 
 /**
