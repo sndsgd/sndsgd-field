@@ -68,6 +68,31 @@ class FieldTest extends \PHPUnit_Framework_TestCase
       $this->field->setDescription(42);
    }
 
+   public function testSetAndGetOption()
+   {
+      $data = ['one' => 1, 'two' => 2];
+      $this->field->setOption($data);
+      $this->assertEquals($data, $this->field->getOption());
+
+      # remove the option 2 (value defaults to null)
+      $this->field->setOption('two');
+      $this->assertEquals(['one' => 1], $this->field->getOption());
+      $this->assertEquals(1, $this->field->getOption('one'));
+
+
+      $this->field->setOption('three', 3);
+      $this->assertEquals(3, $this->field->getOption('three'));
+      $this->assertEquals(1, $this->field->getOption('one'));
+      $this->assertNull($this->field->getOption('two'));
+   }
+
+   /**
+    * @expectedException InvalidArgumentException
+    */
+   public function testSetOptionException()
+   {
+      $this->field->setOption('doesnt-exist');
+   }
 
    public function testSetGetExportName()
    {
