@@ -9,7 +9,7 @@ use \sndsgd\util\Arr;
 /**
  * A base class for a collection of fields
  */
-class Collection
+class Collection extends \sndsgd\util\EventTarget
 {
    /**
     * All fields currently in the collection
@@ -143,12 +143,21 @@ class Collection
     */
    public function validate()
    {
-      $ret = 0;
       $this->validationErrors = [];
-      foreach ($this->fields as $field) {
-         $ret += $field->validate($this);
+
+      if ($this->fire('beforeValidate', [$this]) === false) {
+         return false;
       }
-      return $ret === 0;
+
+      foreach ($this->fields as $field) {
+         $field->validate($this);
+      }
+
+      if ($this->fire('afterValidate', [$this]) === false) {
+         return false;
+      } 
+      
+      return (count($this->validationErrors) === 0);
    }
 
    /**

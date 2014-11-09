@@ -70,6 +70,40 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
       }
    }
 
+   public function testValidationEvents()
+   {
+      $beforeValidate = \Closure::bind(function(Collection $collection) {
+         $errors = $collection->getValidationErrors();
+         $this->assertEquals(0, count($errors));
+      }, $this);
+
+      $afterValidate = \Closure::bind(function(Collection $collection) {
+         $errors = $collection->getValidationErrors();
+         $this->assertEquals(5, count($errors));
+      }, $this);
+
+      $this->coll->on('beforeValidate', $beforeValidate);
+      $this->coll->on('afterValidate', $afterValidate);
+
+      $this->assertFalse($this->coll->validate());
+   }
+
+   public function testBeforeValidateFail()
+   {
+      $this->coll->on('beforeValidate', function(Collection $c) {
+         return false;
+      });
+      $this->assertFalse($this->coll->validate());
+   }
+
+   public function testAfterValidateFail()
+   {
+      $this->coll->on('afterValidate', function(Collection $c) {
+         return false;
+      });
+      $this->assertFalse($this->coll->validate());
+   }
+
    public function testValidationErrors()
    {
       $this->assertFalse($this->coll->hasValidationErrors());
