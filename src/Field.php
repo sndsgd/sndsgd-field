@@ -97,6 +97,13 @@ abstract class Field extends \sndsgd\util\EventTarget
    protected $rules = [];
 
    /**
+    * Optional data storage
+    *
+    * @var array
+    */
+   protected $options = [];
+
+   /**
     * A custom name to export the field as
     * 
     * @var string|null
@@ -221,6 +228,50 @@ abstract class Field extends \sndsgd\util\EventTarget
    }
 
    /**
+    * Set one or more option values
+    * 
+    * @return sndsgd\Field
+    */
+   public function setOption($key, $value = null)
+   {
+      if (is_array($key)) {
+         foreach ($key as $k => $v) {
+            $this->options[$k] = $v;
+         }
+      }
+      else if ($value === null) {
+         if (!array_key_exists($key, $this->options)) {
+            throw new InvalidArgumentException(
+               "invalid value provided for 'key'; ".
+               "expecting the name of an option to remove as string"
+            );
+         }
+         unset($this->options[$key]);
+      }
+      else {
+         $this->options[$key] = $value;
+      }
+      return $this;
+   }
+
+   /**
+    * Get one or all options
+    *
+    * @param string|null $key The value assoiciated with 
+    * @return string|array|null
+    */
+   public function getOption($key = null)
+   {
+      if ($key === null) {
+         return $this->options;
+      }
+
+      return (array_key_exists($key, $this->options))
+         ? $this->options[$key]
+         : null;
+   }
+
+   /**
     * Set a name to export the field as
     * 
     * @param string $name
@@ -316,6 +367,17 @@ abstract class Field extends \sndsgd\util\EventTarget
          $this->value[$index] = $value;   
       }
       return $this;
+   }
+
+   /**
+    * Determine whether or not the field has a value
+    *
+    * Note: the default value is ignored
+    * @return boolean
+    */
+   public function hasValue()
+   {
+      return ($this->value !== null);
    }
 
    /**
