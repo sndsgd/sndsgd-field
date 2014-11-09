@@ -6,7 +6,7 @@ use \sndsgd\field\ValidationError;
 
 class ClosureTest extends \PHPUnit_Framework_TestCase
 {
-   public function test()
+   public function setUp()
    {
       $fn = function($v, $d=null, $n=null, $i=null, $c=null) {
          if (!is_int($v)) {
@@ -14,8 +14,12 @@ class ClosureTest extends \PHPUnit_Framework_TestCase
          }
          return ($v % 2 === 0) ? 'even' : 'odd';
       };
+      $this->rule = new ClosureRule($fn);
+   }
 
-      $rule = new ClosureRule($fn);
+   public function test()
+   {
+      $rule = $this->rule;
 
       # success
       $this->assertEquals('even', $rule->validate(10));
@@ -33,6 +37,13 @@ class ClosureTest extends \PHPUnit_Framework_TestCase
       $result = $rule->validate('some string');
       $this->assertTrue($result instanceof ValidationError);
       $this->assertEquals($msg, $result->getMessage());
+   }
+
+   public function testGetClass()
+   {
+      $res = $this->rule->getClass();
+      $regex = '~[a-z][a-z0-9\\\\]+\\([0-9.]+\\)~i';
+      $this->assertEquals(1,preg_match($regex, $res, $matches));
    }
 
    /**

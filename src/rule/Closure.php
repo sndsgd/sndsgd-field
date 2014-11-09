@@ -39,6 +39,16 @@ class Closure extends \sndsgd\field\Rule
    }
 
    /**
+    * Ensure that multiple Closure rules can be added to a field
+    *
+    * @return string
+    */
+   public function getClass()
+   {
+      return get_called_class().'('.microtime(true).')';
+   }
+
+   /**
     * {@inheritdoc}
     */
    public function validate(
