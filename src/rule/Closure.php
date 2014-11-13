@@ -25,17 +25,17 @@ class Closure extends \sndsgd\field\Rule
    protected $fn;
 
    /**
-    * @param string $value The regex to use in validation
+    * @param callable $handler A function/method to perform validation
     */
-   public function __construct($value = null)
+   public function __construct($handler = null)
    {
-      if ($value === null || !is_callable($value)) {
+      if ($handler === null || !is_callable($handler)) {
          throw new InvalidArgumentException(
-            "invalid value provided for 'value'; ".
+            "invalid value provided for 'handler'; ".
             "expecting a closure"
          );
       }
-      $this->fn = $value;
+      $this->fn = $handler;
    }
 
    /**

@@ -9,8 +9,10 @@ use \sndsgd\util\Arr;
 /**
  * A base class for a collection of fields
  */
-class Collection extends \sndsgd\util\EventTarget
+class Collection
 {
+   use \sndsgd\event\Target;
+
    /**
     * All fields currently in the collection
     * 
@@ -185,7 +187,7 @@ class Collection extends \sndsgd\util\EventTarget
    {
       $this->validationErrors = [];
 
-      if ($this->fire('beforeValidate', [$this]) === false) {
+      if ($this->fire('beforeValidate', ['collection' => $this]) === false) {
          return false;
       }
 
@@ -193,7 +195,7 @@ class Collection extends \sndsgd\util\EventTarget
          $field->validate($this);
       }
 
-      if ($this->fire('afterValidate', [$this]) === false) {
+      if ($this->fire('afterValidate', ['collection' => $this]) === false) {
          return false;
       } 
       

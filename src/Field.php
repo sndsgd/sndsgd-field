@@ -14,8 +14,10 @@ use \sndsgd\util\Arr;
 /**
  * A container for one or more values
  */
-abstract class Field extends \sndsgd\util\EventTarget
+abstract class Field
 {
+   use \sndsgd\event\Target;
+
    // available export types
    const EXPORT_NORMAL = 0;
    const EXPORT_ARRAY = 1;

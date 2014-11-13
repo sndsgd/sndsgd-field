@@ -2,6 +2,7 @@
 
 namespace sndsgd\field;
 
+use \sndsgd\event\Event;
 use \sndsgd\field\rule\Required as RequiredRule;
 
 
@@ -95,12 +96,14 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
    public function testValidationEvents()
    {
-      $beforeValidate = \Closure::bind(function(Collection $collection) {
+      $beforeValidate = \Closure::bind(function(Event $ev) {
+         $collection = $ev->getData('collection');
          $errors = $collection->getValidationErrors();
          $this->assertEquals(0, count($errors));
       }, $this);
 
-      $afterValidate = \Closure::bind(function(Collection $collection) {
+      $afterValidate = \Closure::bind(function(Event $ev) {
+         $collection = $ev->getData('collection');
          $errors = $collection->getValidationErrors();
          $this->assertEquals(5, count($errors));
       }, $this);
@@ -113,7 +116,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
    public function testBeforeValidateFail()
    {
-      $this->coll->on('beforeValidate', function(Collection $c) {
+      $this->coll->on('beforeValidate', function(Event $ev) {
          return false;
       });
       $this->assertFalse($this->coll->validate());
@@ -121,7 +124,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
    public function testAfterValidateFail()
    {
-      $this->coll->on('afterValidate', function(Collection $c) {
+      $this->coll->on('afterValidate', function(Event $ev) {
          return false;
       });
       $this->assertFalse($this->coll->validate());
