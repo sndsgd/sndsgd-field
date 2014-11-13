@@ -1,5 +1,6 @@
 <?php
 
+use \sndsgd\field\Field;
 use \sndsgd\field\rule\Closure as ClosureRule;
 use \sndsgd\field\ValidationError;
 
@@ -42,8 +43,7 @@ class ClosureTest extends \PHPUnit_Framework_TestCase
    public function testGetClass()
    {
       $res = $this->rule->getClass();
-      $regex = '~[a-z][a-z0-9\\\\]+\\([0-9.]+\\)~i';
-      $this->assertEquals(1,preg_match($regex, $res, $matches));
+      $this->assertTrue(is_string($res));
    }
 
    /**
@@ -52,6 +52,26 @@ class ClosureTest extends \PHPUnit_Framework_TestCase
    public function testConstructorNotCallableException()
    {
       new ClosureRule([]);
+   }
+
+   public function testAddMultipleClosureRules()
+   {
+      $field = Field::string('test')
+         ->addRules(
+            $this->rule,
+            new ClosureRule(function($v, $d, $n, $i, $c) {
+               return $v;
+            }),
+            new ClosureRule(function($v, $d, $n, $i, $c) {
+               return $v;
+            }),
+            new ClosureRule(function($v, $d, $n, $i, $c) {
+               return $v;
+            }),
+            new ClosureRule(function($v, $d, $n, $i, $c) {
+               return $v;
+            })
+         );
    }
 }
 

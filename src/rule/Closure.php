@@ -45,7 +45,12 @@ class Closure extends \sndsgd\field\Rule
     */
    public function getClass()
    {
-      return get_called_class().'('.microtime(true).')';
+      if (is_string($this->fn)) {
+         return $this->fn;
+      }
+
+      $rand = mt_rand().' '.microtime(true);
+      return 'sndsgd\field\rule\Closure('.sha1($rand).')';
    }
 
    /**
