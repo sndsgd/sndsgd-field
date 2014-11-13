@@ -2,6 +2,7 @@
 
 namespace sndsgd\field;
 
+use \sndsgd\event\Event;
 use \sndsgd\field\rule\Required as RequiredRule;
 use \sndsgd\field\rule\MinValue as MinValueRule;
 use \sndsgd\field\rule\MaxValue as MaxValueRule;
@@ -51,6 +52,22 @@ class FieldTest extends \PHPUnit_Framework_TestCase
    public function testCallStaticNameException()
    {
       Field::int([]);
+   }
+
+   public function testFieldEvents()
+   {
+      $result = null;
+      $this->field->on('parse', function(Event $ev) use (&$result) {
+         $result = $ev->getData('name');
+      });
+
+      $this->field->fire('parse', [
+         'collection' => null,
+         'field' => $this->field,
+         'name' => 'test'
+      ]);
+
+      $this->assertEquals($result, 'test');
    }
 
    public function testSetGetDescription()
