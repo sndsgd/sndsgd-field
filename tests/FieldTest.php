@@ -236,20 +236,16 @@ class FieldTest extends \PHPUnit_Framework_TestCase
       $this->assertEquals(0, $this->field->validate());
    }
 
-   // public function testValidateUpdateValue()
-   // {
-   //    $coll = new Collection();
-   //    $coll->addFields($this->field);
-   //    $this->field->addRules(
-   //       Rule::addEmoticon(function($v, $d, $n, $i, $c) {
-   //          return $v.' '.$d;
-   //       }, ':)')
-   //    );
+   public function testGetRules()
+   {
+      $this->field->addRules(
+         new RequiredRule,
+         new MinValueRule(1),
+         new MaxValueRule(10)
+      );
 
-   //    $this->field->addValue('hello');
-   //    $this->field->validate();
-   //    $this->assertEquals('hello :)', $this->field->exportValue());
-   // }
+      $this->assertEquals(3, count($this->field->getRules()));
+   }
 }
 
 

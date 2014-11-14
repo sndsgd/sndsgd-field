@@ -62,7 +62,7 @@ abstract class Field
    protected $name;
 
    /**
-    * One or more aliases for the field
+    * One or more aliases for the field name
     *
     * Note: used for short names in cli scripts
     * @var array.<string,boolean>
@@ -80,13 +80,14 @@ abstract class Field
    /**
     * The default value
     * 
-    * @var string|integer|float
+    * @var string|integer|float|null
     */
    protected $defaultValue = null;
 
    /**
     * The value(s) are stored in an indexed array
     *
+    * When the field has a value, this will always be an array of values
     * @var array.<string|integer|float|boolean>|null
     */
    protected $value = null;
@@ -94,14 +95,14 @@ abstract class Field
    /**
     * Validation rules
     * 
-    * @var array.<sndsgd\field\Rule>
+    * @var array.<string,sndsgd\field\Rule>
     */
    protected $rules = [];
 
    /**
     * Optional data storage
     *
-    * @var array
+    * @var array.<
     */
    protected $options = [];
 
@@ -161,9 +162,8 @@ abstract class Field
    /**
     * Add one or more aliases to the field
     *
-    * @param string $alias
+    * @param string $alias,... 
     * @return sndsgd\field\Field
-    * 
     */
    public function addAliases($alias)
    {
@@ -450,17 +450,6 @@ abstract class Field
    }
 
    /**
-    * Determine whether or not the field has a particular rule
-    * 
-    * @param string $ruleName The name of the rule
-    * @return boolean
-    */
-   public function hasRule($ruleName)
-   {
-      return array_key_exists($ruleName, $this->rules);
-   }
-
-   /**
     * Add one or more validation rules to the field
     * 
     * @param sndsgd\field\Rule,... $rule 
@@ -493,6 +482,27 @@ abstract class Field
          }
       }
       return $this;  
+   }
+
+   /**
+    * Determine whether or not the field has a particular rule
+    * 
+    * @param string $ruleName The name of the rule
+    * @return boolean
+    */
+   public function hasRule($ruleName)
+   {
+      return array_key_exists($ruleName, $this->rules);
+   }
+
+   /**
+    * Get all the rules
+    *
+    * @return array.<string,sndsgd\field\Rule|callable>
+    */
+   public function getRules()
+   {
+      return $this->rules;
    }
 
    /**
