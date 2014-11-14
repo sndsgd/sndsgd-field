@@ -3,6 +3,7 @@
 namespace sndsgd\field;
 
 use \Exception;
+use \InvalidArgumentException;
 use \sndsgd\util\Arr;
 
 
@@ -210,6 +211,29 @@ class Collection
    public function hasValidationErrors()
    {
       return (count($this->validationErrors) !== 0);
+   }
+
+   /**
+    * Convenience method to get a particular field value
+    * 
+    * @return mixed
+    * @throws InvalidArgumentException If provided name does not exist
+    */
+   public function exportFieldValue($name)
+   {
+      if (!is_string($name)) {
+         throw new InvalidArgumentException(
+            "invalid value provided for 'name'; ".
+            "expecting a field name as string"
+         );
+      }
+      else if (($field = $this->getField($name)) == null) {
+         throw new InvalidArgumentException(
+            "invalid value provided for 'name'; ".
+            "the field '{$name}' does not exist in the collection"
+         );
+      }
+      return $field->exportValue();
    }
 
    /**

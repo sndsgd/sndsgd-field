@@ -185,5 +185,33 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
       $errors = $this->coll->getValidationErrors();
       $this->assertEquals(2, count($errors));
    }
+
+   public function testExportFieldValue()
+   {
+      $this->coll->addValues($this->values);
+      $this->assertEquals(1024, $this->coll->exportFieldValue('image-width'));
+      $this->assertEquals(
+         $this->values['title'], 
+         $this->coll->exportFieldValue('title')
+      );
+   }
+
+   /**
+    * @expectedException InvalidArgumentException
+    */
+   public function testExportFieldValueInvalidArgException()
+   {
+      $this->coll->addValues($this->values);
+      $this->coll->exportFieldValue(42);
+   }
+
+   /**
+    * @expectedException InvalidArgumentException
+    */
+   public function testExportFieldValueDoesntExistException()
+   {
+      $this->coll->addValues($this->values);
+      $this->coll->exportFieldValue('nope');
+   }
 }
 
