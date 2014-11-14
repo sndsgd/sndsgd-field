@@ -7,6 +7,11 @@ use \sndsgd\field\ValidationError;
 
 class ClosureTest extends \PHPUnit_Framework_TestCase
 {
+   public static function stringValidatorTest($v, $d, $n, $i, $c)
+   {
+      return $v;
+   }
+
    public function setUp()
    {
       $fn = function($v, $d=null, $n=null, $i=null, $c=null) {
@@ -44,6 +49,9 @@ class ClosureTest extends \PHPUnit_Framework_TestCase
    {
       $res = $this->rule->getClass();
       $this->assertTrue(is_string($res));
+
+      $r = new ClosureRule('ClosureTest::stringValidatorTest');
+      $this->assertTrue(is_string($r->getClass()));
    }
 
    /**
