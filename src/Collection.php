@@ -148,20 +148,18 @@ class Collection
    public function validate()
    {
       $this->validationErrors = [];
-
       if ($this->fire('beforeValidate', ['collection' => $this]) === false) {
          return false;
       }
-
+      $errs = 0;
       foreach ($this->fields as $field) {
-         $field->validate($this);
+         $errs += $field->validate($this);
       }
-
-      if ($this->fire('afterValidate', ['collection' => $this]) === false) {
-         return false;
-      } 
-      
-      return (count($this->validationErrors) === 0);
+      return (
+         $errs > 0 ||
+         $this->fire('afterValidate', ['collection' => $this]) === false ||
+         count($this->validationErrors) > 0
+      ) ? false : true;
    }
 
    /**
