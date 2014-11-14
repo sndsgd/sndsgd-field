@@ -11,7 +11,7 @@ use \sndsgd\util\Arr;
  */
 class Collection
 {
-   use \sndsgd\event\Target;
+   use \sndsgd\event\Target, \sndsgd\util\data\Manager;
 
    /**
     * All fields currently in the collection
@@ -34,12 +34,6 @@ class Collection
     */
    protected $validationErrors = null;
 
-   /**
-    * Store data that required expensive operations to get
-    *
-    * @var array.<string,mixed>
-    */
-   protected $data = [];
 
    /**
     * Define a field
@@ -143,39 +137,6 @@ class Collection
             }
          }
       }
-   }
-
-
-   /**
-    * Stash data in this object
-    *
-    * Helpful when performing expensive operations during validation on data
-    * that will be required later in the script
-    * @param string $key The name to stash data under
-    * @param mixed $value Whatever needs to be stashed
-    * @return void
-    */
-   public function addData($key, $value)
-   {
-      $this->data[$key] = $value;
-   }
-
-   /**
-    * Retrieve data from this object
-    *
-    * @param string $key The name to stash data under
-    * @param mixed $value Whatever needs to be stashed
-    * @return void
-    */
-   public function getData($key = null)
-   {
-      if ($key === null) {
-         return $this->data;
-      }
-      else if (!array_key_exists($key, $this->data)) {
-         return null;
-      }
-      return $this->data[$key];
    }
 
    /**
