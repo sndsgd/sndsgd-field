@@ -47,7 +47,7 @@ class PathTest extends \sndsgd\field\Rule
       $path = Path::normalize($value);
       $test = Path::test($path, $this->bitmask);
       return ($test === true)
-         ? $value
+         ? $path
          : new ValidationError($test, $value, $name, $index);
    }
 }
