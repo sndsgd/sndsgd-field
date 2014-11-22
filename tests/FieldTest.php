@@ -244,7 +244,8 @@ class FieldTest extends \PHPUnit_Framework_TestCase
          new MaxValueRule(10)
       );
 
-      $this->assertEquals(3, count($this->field->getRules()));
+      # the string field starts with a NotBoolean rule
+      $this->assertEquals(4, count($this->field->getRules()));
    }
 }
 

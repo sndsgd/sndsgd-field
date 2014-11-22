@@ -3,6 +3,7 @@
 namespace sndsgd\field;
 
 use \InvalidArgumentException;
+use \sndsgd\field\rule\NotBoolean as NotBooleanRule;
 
 
 /**
@@ -18,7 +19,9 @@ class StringField extends Field
     */
    public static function create($name, $default = null)
    {
-      return new self($name);
+      $field = new self($name);
+      $field->addRules(new NotBooleanRule());
+      return $field;
    }
 
    /**

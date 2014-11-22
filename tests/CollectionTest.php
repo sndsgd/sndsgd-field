@@ -116,18 +116,29 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
    public function testBeforeValidateFail()
    {
-      $this->coll->on('beforeValidate', function(Event $ev) {
+      $coll = new Collection;
+      $coll->on('beforeValidate', function(Event $ev) {
          return false;
       });
-      $this->assertFalse($this->coll->validate());
+      $this->assertFalse($coll->validate());
    }
 
    public function testAfterValidateFail()
    {
-      $this->coll->on('afterValidate', function(Event $ev) {
+      $coll = new Collection;
+      $coll->on('afterValidate', function(Event $ev) {
          return false;
       });
-      $this->assertFalse($this->coll->validate());
+      $this->assertFalse($coll->validate());
+
+      $coll = new Collection;
+      $coll->on('afterValidate', function(Event $ev) {
+         $coll = $ev->getData('collection');
+         $err = new ValidationError('something went wrong', '', 'name', 0);
+         $coll->addValidationError($err);
+         return true;
+      });
+      $this->assertFalse($coll->validate());
    }
 
    public function testValidationErrors()
