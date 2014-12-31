@@ -33,7 +33,7 @@ class Collection
     * 
     * @var array.<sndsgd\field\ValidationError>|null
     */
-   protected $validationErrors = null;
+   protected $validationErrors = [];
 
 
    /**
@@ -147,11 +147,12 @@ class Collection
     */
    public function validate()
    {
-      $this->validationErrors = [];
+      # note: addValues adds validation errors for unknown values
+      $errs = count($this->validationErrors);
+
       if ($this->fire('beforeValidate', ['collection' => $this]) === false) {
          return false;
       }
-      $errs = 0;
       foreach ($this->fields as $field) {
          $errs += $field->validate($this);
       }

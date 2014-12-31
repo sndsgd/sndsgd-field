@@ -184,13 +184,15 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
       $this->assertFalse($result);
       $errors = $this->coll->getValidationErrors();
       $this->assertEquals(5, count($errors));
+   }
 
+   public function testValidate2()
+   {
       $this->coll->addValues([
          'image-width' => '1024',
          'image-height' => 768,
          'image-format' => 'jpeg'
       ]);
-
       $result = $this->coll->validate();
       $this->assertFalse($result);
       $errors = $this->coll->getValidationErrors();
