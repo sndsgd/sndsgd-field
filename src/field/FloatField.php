@@ -9,7 +9,7 @@ use \sndsgd\field\rule\Float as FloatRule;
 /**
  * A field for storing float values
  */
-class FloatField extends Field
+class FloatField extends \sndsgd\Field
 {
    /**
     * Create a float field with sensible default rules

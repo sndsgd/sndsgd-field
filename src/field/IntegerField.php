@@ -9,7 +9,7 @@ use \sndsgd\field\rule\Integer as IntegerRule;
 /**
  * A field for storing integer values
  */
-class IntegerField extends Field
+class IntegerField extends \sndsgd\Field
 {
    /**
     * Create an integer field with sensible default rules

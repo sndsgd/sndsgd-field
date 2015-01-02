@@ -1,6 +1,6 @@
 <?php
 
-namespace sndsgd\field;
+namespace sndsgd;
 
 use \Exception;
 use \InvalidArgumentException;

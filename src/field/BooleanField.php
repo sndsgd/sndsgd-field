@@ -10,7 +10,7 @@ use \sndsgd\field\rule\MaxValueCount as MaxValueCountRule;
 /**
  * A field for storing boolean values
  */
-class BooleanField extends Field
+class BooleanField extends \sndsgd\Field
 {
    /**
     * Create a boolean field with sensible default rules

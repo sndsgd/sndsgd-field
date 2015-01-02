@@ -9,7 +9,7 @@ use \sndsgd\field\rule\NotBoolean as NotBooleanRule;
 /**
  * A field for storing string values
  */
-class StringField extends Field
+class StringField extends \sndsgd\Field
 {
    /**
     * Create a string field with sensible default rules

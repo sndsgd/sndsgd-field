@@ -1,6 +1,6 @@
 <?php
 
-use \sndsgd\field\Field;
+use \sndsgd\Field;
 use \sndsgd\field\rule\Closure as ClosureRule;
 use \sndsgd\field\ValidationError;
 

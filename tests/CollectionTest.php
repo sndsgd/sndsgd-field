@@ -3,6 +3,7 @@
 namespace sndsgd\field;
 
 use \sndsgd\event\Event;
+use \sndsgd\Field;
 use \sndsgd\field\rule\Required as RequiredRule;
 
 
