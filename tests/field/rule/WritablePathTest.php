@@ -7,7 +7,7 @@ use \sndsgd\util\Dir;
 use \sndsgd\util\File;
 
 
-class WritablePathTest extends \PHPUnit_Framework_TestCase
+class WritablePathTest extends RuleTestCase
 {
    public function testDir()
    {
@@ -15,14 +15,14 @@ class WritablePathTest extends \PHPUnit_Framework_TestCase
 
       # success
       $test = sys_get_temp_dir();
-      $this->assertFalse($rule->validate($test) instanceof ValidationError);
+      $this->assertValid($rule->validate($test));
       $test = sys_get_temp_dir().DIRECTORY_SEPARATOR.'newdir';
-      $this->assertFalse($rule->validate($test) instanceof ValidationError);
+      $this->assertValid($rule->validate($test));
       $test = __DIR__.'/some/new/dir';
-      $this->assertFalse($rule->validate($test) instanceof ValidationError);
+      $this->assertValid($rule->validate($test));
 
       # failure
-      $this->assertTrue($rule->validate('/___nope___') instanceof ValidationError);
+      $this->assertValidationError($rule->validate('/___nope___'));
    }
 
    public function testFile()
@@ -31,13 +31,13 @@ class WritablePathTest extends \PHPUnit_Framework_TestCase
 
       # success
       $test = sys_get_temp_dir().DIRECTORY_SEPARATOR.'file.txt';
-      $this->assertFalse($rule->validate($test) instanceof ValidationError);
+      $this->assertValid($rule->validate($test));
       $test = __DIR__.'/some/new/file.txt';
-      $this->assertFalse($rule->validate($test) instanceof ValidationError);
+      $this->assertValid($rule->validate($test));
 
       # failure
       $test = '/___nope___/file.txt';
-      $this->assertTrue($rule->validate($test) instanceof ValidationError);
+      $this->assertValidationError($rule->validate($test));
    }
 
    /**

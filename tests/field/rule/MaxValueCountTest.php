@@ -2,12 +2,12 @@
 
 namespace sndsgd\field\rule;
 
-use \sndsgd\field\Collection;
 use \sndsgd\Field;
+use \sndsgd\field\Collection;
 use \sndsgd\field\ValidationError;
 
 
-class MaxValueCountTest extends \PHPUnit_Framework_TestCase
+class MaxValueCountTest extends RuleTestCase
 {
    public function test()
    {
@@ -19,12 +19,12 @@ class MaxValueCountTest extends \PHPUnit_Framework_TestCase
       # 1 value
       $field->addValue(1);
       $result = $rule->validate($field->getValue(0), 'test', 0, $coll);
-      $this->assertFalse($result instanceof ValidationError);
+      $this->assertValid($result);
 
       # 2 values
       $field->addValue(1);
       $result = $rule->validate($field->getValue(0), 'test', 0, $coll);
-      $this->assertTrue($result instanceof ValidationError);
+      $this->assertValidationError($result);
    }
 
    /**

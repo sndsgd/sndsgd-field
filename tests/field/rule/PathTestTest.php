@@ -7,22 +7,22 @@ use \sndsgd\util\Dir;
 use \sndsgd\util\File;
 
 
-class PathTestTest extends \PHPUnit_Framework_TestCase
+class PathTestTest extends RuleTestCase
 {
    public function test()
    {
       $rule = new PathTest(Dir::WRITABLE);
 
       # success
-      $this->assertFalse($rule->validate(sys_get_temp_dir()) instanceof ValidationError);
+      $this->assertValid($rule->validate(sys_get_temp_dir()));
 
       # failure
-      $this->assertTrue($rule->validate('/___nope___') instanceof ValidationError);
+      $this->assertValidationError($rule->validate('/___nope___'));
 
 
       $rule = new PathTest(File::READABLE);
-      $this->assertFalse($rule->validate(__FILE__) instanceof ValidationError);
-      $this->assertTrue($rule->validate(__DIR__) instanceof ValidationError);
+      $this->assertValid($rule->validate(__FILE__));
+      $this->assertValidationError($rule->validate(__DIR__));
    }
 
    /**

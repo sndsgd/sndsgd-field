@@ -5,7 +5,7 @@ namespace sndsgd\field\rule;
 use \sndsgd\field\ValidationError;
 
 
-class BooleanTest extends \PHPUnit_Framework_TestCase
+class BooleanTest extends RuleTestCase
 {
    public function testNotBoolean()
    {
@@ -22,9 +22,8 @@ class BooleanTest extends \PHPUnit_Framework_TestCase
       $this->assertFalse($rule->validate(0));
       $this->assertFalse($rule->validate('0'));
 
-
-      $this->assertTrue($rule->validate([]) instanceof ValidationError);
-      $this->assertTrue($rule->validate('russell') instanceof ValidationError);
+      $this->assertValidationError($rule->validate([]));
+      $this->assertValidationError($rule->validate('russell'));
    }
 }
 

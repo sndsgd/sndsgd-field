@@ -5,17 +5,17 @@ namespace sndsgd\field\rule;
 use \sndsgd\field\ValidationError;
 
 
-class RegexTest extends \PHPUnit_Framework_TestCase
+class RegexTest extends RuleTestCase
 {
    public function test()
    {
       $rule = new Regex('/[A-Z][a-z]+/');
 
       # success
-      $this->assertFalse($rule->validate('Hello') instanceof ValidationError);
+      $this->assertValid($rule->validate('Hello'));
 
       # failure
-      $this->assertTrue($rule->validate('hello') instanceof ValidationError);
+      $this->assertValidationError($rule->validate('hello'));
    }
 
    /**

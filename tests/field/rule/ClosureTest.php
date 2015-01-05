@@ -1,11 +1,12 @@
 <?php
 
+namespace sndsgd\field\rule;
+
 use \sndsgd\Field;
-use \sndsgd\field\rule\Closure as ClosureRule;
 use \sndsgd\field\ValidationError;
 
 
-class ClosureTest extends \PHPUnit_Framework_TestCase
+class ClosureTest extends RuleTestCase
 {
    public static function stringValidatorTest($v, $d, $n, $i, $c)
    {
@@ -14,13 +15,12 @@ class ClosureTest extends \PHPUnit_Framework_TestCase
 
    public function setUp()
    {
-      $fn = function($v, $d=null, $n=null, $i=null, $c=null) {
+      $this->rule = new Closure(function($v, $d=null, $n=null, $i=null, $c=null) {
          if (!is_int($v)) {
             return new ValidationError('expecting an integer', $v, $n, $i);
          }
          return ($v % 2 === 0) ? 'even' : 'odd';
-      };
-      $this->rule = new ClosureRule($fn);
+      });
    }
 
    public function test()
@@ -34,14 +34,14 @@ class ClosureTest extends \PHPUnit_Framework_TestCase
       $this->assertEquals('odd', $rule->validate(7));
    
       # failure
-      $this->assertTrue($rule->validate('abc') instanceof ValidationError);
-      $this->assertTrue($rule->validate([]) instanceof ValidationError);
-      $this->assertTrue($rule->validate('10') instanceof ValidationError);
+      $this->assertValidationError($rule->validate('abc'));
+      $this->assertValidationError($rule->validate([]));
+      $this->assertValidationError($rule->validate('10'));
 
       $msg = 'provided value is not an integer';
       $rule->setMessage($msg);
       $result = $rule->validate('some string');
-      $this->assertTrue($result instanceof ValidationError);
+      $this->assertValidationError($result);
       $this->assertEquals($msg, $result->getMessage());
    }
 
@@ -50,7 +50,7 @@ class ClosureTest extends \PHPUnit_Framework_TestCase
       $res = $this->rule->getClass();
       $this->assertTrue(is_string($res));
 
-      $r = new ClosureRule('ClosureTest::stringValidatorTest');
+      $r = new Closure(__CLASS__.'::stringValidatorTest');
       $this->assertTrue(is_string($r->getClass()));
    }
 
@@ -59,24 +59,24 @@ class ClosureTest extends \PHPUnit_Framework_TestCase
     */
    public function testConstructorNotCallableException()
    {
-      new ClosureRule([]);
+      new Closure([]);
    }
 
-   public function testAddMultipleClosureRules()
+   public function testAddMultipleClosures()
    {
       $field = Field::string('test')
          ->addRules(
             $this->rule,
-            new ClosureRule(function($v, $d, $n, $i, $c) {
+            new Closure(function($v, $d, $n, $i, $c) {
                return $v;
             }),
-            new ClosureRule(function($v, $d, $n, $i, $c) {
+            new Closure(function($v, $d, $n, $i, $c) {
                return $v;
             }),
-            new ClosureRule(function($v, $d, $n, $i, $c) {
+            new Closure(function($v, $d, $n, $i, $c) {
                return $v;
             }),
-            new ClosureRule(function($v, $d, $n, $i, $c) {
+            new Closure(function($v, $d, $n, $i, $c) {
                return $v;
             })
          );
