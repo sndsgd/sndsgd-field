@@ -3,6 +3,7 @@
 [![Latest Version](https://img.shields.io/github/release/sndsgd/sndsgd-field.svg?style=flat-square)](https://github.com/sndsgd/sndsgd-field/releases)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://github.com/sndsgd/sndsgd-field/LICENSE)
 [![Build Status](https://img.shields.io/travis/sndsgd/sndsgd-field/master.svg?style=flat-square)](https://travis-ci.org/sndsgd/sndsgd-field)
+[![Coverage Status](https://img.shields.io/coveralls/sndsgd/sndsgd-field.svg?style=flat-square)](https://coveralls.io/r/sndsgd/sndsgd-field?branch=master)
 [![Total Downloads](https://img.shields.io/packagist/dt/sndsgd/field.svg?style=flat-square)](https://packagist.org/packages/sndsgd/field)
 
 
