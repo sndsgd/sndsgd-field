@@ -1,5 +1,8 @@
 language: php
 
+env:
+  - COVERALLS_PHP_VERSION="5.5"
+
 php:
   - 5.4
   - 5.5
@@ -16,4 +19,4 @@ script:
   - phpunit --coverage-clover tests/coverage-clover.xml
 
 after_script:
-  - vendor/bin/coveralls -v
+  - bin/aftertest
