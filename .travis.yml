@@ -13,7 +13,6 @@ before_install:
 
 install:
   - composer install --no-interaction --prefer-source --dev
-  - composer require satooshi/php-coveralls:dev-master
 
 script:
   - phpunit --coverage-clover tests/coverage-clover.xml
