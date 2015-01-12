@@ -3,10 +3,10 @@
 namespace sndsgd\field\rule;
 
 use \DateTime;
-use \sndsgd\field\ValidationError;
+use \StdClass;
 
 
-class DateStringTest extends RuleTestCase
+class DateStringTest extends \sndsgd\field\RuleTestCase
 {
    public function testDateString()
    {
@@ -22,7 +22,7 @@ class DateStringTest extends RuleTestCase
       $this->assertValidationError($rule->validate(true));
       $this->assertValidationError($rule->validate(false));
       $this->assertValidationError($rule->validate([]));
-      $this->assertValidationError($rule->validate(new \StdClass));
+      $this->assertValidationError($rule->validate(new StdClass));
    }
 }
 

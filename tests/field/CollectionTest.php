@@ -7,6 +7,9 @@ use \sndsgd\Field;
 use \sndsgd\field\rule\Required as RequiredRule;
 
 
+/**
+ * @coversDefaultClass \sndsgd\field\Collection
+ */
 class CollectionTest extends \PHPUnit_Framework_TestCase
 {
    protected function setUp()
@@ -36,6 +39,17 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
          'image-height' => 768,
          'image-format' => 'jpeg'
       ];
+   }
+
+   /**
+    * @covers ::__construct
+    */
+   public function testAddFieldsConstructor()
+   {
+      $coll = new Collection([ Field::boolean('test') ]);
+      $field = $coll->getField('test');
+      $this->assertInstanceOf('sndsgd\\field\\Boolean', $field);
+
    }
 
    /**
@@ -220,7 +234,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
    }
 
    /**
-    * @expectedException InvalidArgumentException
+    * @expectedException \sndsgd\field\UnknownFieldException
     */
    public function testExportFieldValueDoesntExistException()
    {

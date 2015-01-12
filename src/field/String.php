@@ -9,13 +9,13 @@ use \sndsgd\field\rule\NotBoolean as NotBooleanRule;
 /**
  * A field for storing string values
  */
-class StringField extends \sndsgd\Field
+class String extends \sndsgd\Field
 {
    /**
     * Create a string field with sensible default rules
     *
     * @param string $name The name of the field
-    * @return sndsgd\field\StringField
+    * @return sndsgd\field\String
     */
    public static function create($name, $default = null)
    {

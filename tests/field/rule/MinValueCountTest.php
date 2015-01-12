@@ -4,10 +4,9 @@ namespace sndsgd\field\rule;
 
 use \sndsgd\Field;
 use \sndsgd\field\Collection;
-use \sndsgd\field\ValidationError;
 
 
-class MinValueCountTest extends RuleTestCase
+class MinValueCountTest extends \sndsgd\field\RuleTestCase
 {
    public function test()
    {

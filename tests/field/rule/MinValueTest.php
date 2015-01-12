@@ -2,10 +2,8 @@
 
 namespace sndsgd\field\rule;
 
-use \sndsgd\field\ValidationError;
 
-
-class MinValueTest extends RuleTestCase
+class MinValueTest extends \sndsgd\field\RuleTestCase
 {
    public function test()
    {

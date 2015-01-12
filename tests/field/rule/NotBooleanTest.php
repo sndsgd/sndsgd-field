@@ -2,10 +2,8 @@
 
 namespace sndsgd\field\rule;
 
-use \sndsgd\field\ValidationError;
 
-
-class NotBooleanTest extends RuleTestCase
+class NotBooleanTest extends \sndsgd\field\RuleTestCase
 {
    public function testNotBoolean()
    {

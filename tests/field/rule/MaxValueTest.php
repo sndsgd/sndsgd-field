@@ -2,10 +2,8 @@
 
 namespace sndsgd\field\rule;
 
-use \sndsgd\field\ValidationError;
 
-
-class MaxValueTest extends RuleTestCase
+class MaxValueTest extends \sndsgd\field\RuleTestCase
 {
    public function test()
    {

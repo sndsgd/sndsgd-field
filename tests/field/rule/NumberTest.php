@@ -2,10 +2,11 @@
 
 namespace sndsgd\field\rule;
 
-use \sndsgd\field\ValidationError;
+use \StdClass;
 
 
-class NumberTest extends RuleTestCase
+
+class NumberTest extends \sndsgd\field\RuleTestCase
 {
    public function testFloat()
    {
@@ -25,7 +26,7 @@ class NumberTest extends RuleTestCase
       $this->assertValidationError($rule->validate(true));
       $this->assertValidationError($rule->validate(false));
       $this->assertValidationError($rule->validate([]));
-      $this->assertValidationError($rule->validate(new \StdClass));
+      $this->assertValidationError($rule->validate(new StdClass));
    }
 }
 

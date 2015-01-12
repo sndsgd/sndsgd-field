@@ -6,7 +6,7 @@ use \sndsgd\Field;
 use \sndsgd\field\ValidationError;
 
 
-class ClosureTest extends RuleTestCase
+class ClosureTest extends \sndsgd\field\RuleTestCase
 {
    public static function stringValidatorTest($v, $d, $n, $i, $c)
    {

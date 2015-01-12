@@ -5,9 +5,9 @@ namespace sndsgd\field\rule;
 use \InvalidArgumentException;
 use \sndsgd\field\Collection;
 use \sndsgd\field\ValidationError;
-use \sndsgd\util\Dir;
-use \sndsgd\util\File;
-use \sndsgd\util\Path;
+use \sndsgd\Dir;
+use \sndsgd\File;
+use \sndsgd\Path;
 
 
 /**

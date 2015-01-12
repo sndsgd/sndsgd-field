@@ -2,12 +2,11 @@
 
 namespace sndsgd\field\rule;
 
-use \sndsgd\field\ValidationError;
-use \sndsgd\util\Dir;
-use \sndsgd\util\File;
+use \sndsgd\Dir;
+use \sndsgd\File;
 
 
-class PathTestTest extends RuleTestCase
+class PathTestTest extends \sndsgd\field\RuleTestCase
 {
    public function test()
    {

@@ -2,12 +2,8 @@
 
 namespace sndsgd\field\rule;
 
-use \sndsgd\field\ValidationError;
-use \sndsgd\util\Dir;
-use \sndsgd\util\File;
 
-
-class WritablePathTest extends RuleTestCase
+class WritablePathTest extends \sndsgd\field\RuleTestCase
 {
    public function testDir()
    {

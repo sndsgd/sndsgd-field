@@ -2,10 +2,8 @@
 
 namespace sndsgd\field\rule;
 
-use \sndsgd\field\ValidationError;
 
-
-class ClassnameTest extends RuleTestCase
+class ClassnameTest extends \sndsgd\field\RuleTestCase
 {
    public function testRule()
    {
@@ -16,7 +14,7 @@ class ClassnameTest extends RuleTestCase
       $this->assertValid($rule->validate('\yep'));
       $this->assertValid($rule->validate('\yep\it_is0'));
 
-      # sndsgd\util\Classname trims excess chars
+      # sndsgd\Classname trims excess chars
       $this->assertValid($rule->validate('yep\\'));
 
 

@@ -5,7 +5,7 @@ namespace sndsgd\field;
 use \Exception;
 use \InvalidArgumentException;
 use \sndsgd\Field;
-use \sndsgd\util\Arr;
+use \sndsgd\Arr;
 
 
 /**
@@ -13,12 +13,20 @@ use \sndsgd\util\Arr;
  */
 class Collection
 {
-   use \sndsgd\event\Target, \sndsgd\util\data\Manager;
+   use \sndsgd\event\Target, \sndsgd\data\Manager;
+
+   /**
+    * The data event key for the collection object whenever an event is
+    * fired at a field
+    * 
+    * @var string
+    */
+   const EVENT_DATA_KEY = 'collection';
 
    /**
     * All fields currently in the collection
     * 
-    * @var array.<string,sndsgd\field\Field>
+    * @var array.<string,sndsgd\Field>
     */
    protected $fields = [];
 
@@ -36,11 +44,22 @@ class Collection
     */
    protected $validationErrors = [];
 
+   /**
+    * Create a new field collection
+    * 
+    * @param array.<sndsgd\Field>|null $fields Fields to add to the collection
+    */
+   public function __construct(array $fields = null)
+   {
+      if ($fields !== null) {
+         $this->addFields($fields);
+      }
+   }
 
    /**
     * Define a field
     * 
-    * @param sndsgd\field\Field $field The field to define
+    * @param sndsgd\Field $field The field to define
     * @return sndsgd\field\Collection
     */
    protected function addField(Field $field)
@@ -91,8 +110,8 @@ class Collection
     * Get a field instance
     * 
     * @param string $name An alias or name of the field to get
-    * @return sndsgd\field\Field|null
-    * @return sndsgd\field\Field The field was found
+    * @return sndsgd\Field|null
+    * @return sndsgd\Field The field was found
     * @return null The field was NOT found
     */
    public function getField($name)
@@ -107,7 +126,7 @@ class Collection
    /**
     * Get an associative array of the fields in this collection
     * 
-    * @return array.<string,sndsgd\field\Field>
+    * @return array.<string,sndsgd\Field>
     */
    public function getFields()
    {
@@ -151,7 +170,9 @@ class Collection
       # note: addValues adds validation errors for unknown values
       $errs = count($this->validationErrors);
 
-      if ($this->fire('beforeValidate', ['collection' => $this]) === false) {
+      $dataKey = constant(get_called_class().'::EVENT_DATA_KEY');
+
+      if ($this->fire('beforeValidate', [$dataKey => $this]) === false) {
          return false;
       }
       foreach ($this->fields as $field) {
@@ -159,7 +180,7 @@ class Collection
       }
       return (
          $errs > 0 ||
-         $this->fire('afterValidate', ['collection' => $this]) === false ||
+         $this->fire('afterValidate', [$dataKey => $this]) === false ||
          count($this->validationErrors) > 0
       ) ? false : true;
    }
@@ -180,6 +201,16 @@ class Collection
          $this->validationErrors[] = $error;
       }
       return count($this->validationErrors);
+   }
+
+   /**
+    * Determine if any validation errors exist
+    * 
+    * @return boolean
+    */
+   public function hasValidationErrors()
+   {
+      return (count($this->validationErrors) !== 0);
    }
 
    /**
@@ -204,16 +235,6 @@ class Collection
    }
 
    /**
-    * Determine if any validation errors exist
-    * 
-    * @return boolean
-    */
-   public function hasValidationErrors()
-   {
-      return (count($this->validationErrors) !== 0);
-   }
-
-   /**
     * Convenience method to get a particular field value
     * 
     * @return mixed
@@ -228,7 +249,7 @@ class Collection
          );
       }
       else if (($field = $this->getField($name)) == null) {
-         throw new InvalidArgumentException(
+         throw new UnknownFieldException(
             "invalid value provided for 'name'; ".
             "the field '{$name}' does not exist in the collection"
          );
@@ -237,15 +258,16 @@ class Collection
    }
 
    /**
-    * 
+    * Get all field values using their respective export handlers
+    *
+    * @return  array.<string,mixed>
     */
    public function exportValues()
    {
       $ret = [];
       foreach ($this->fields as $field) {
          if ($field->getExportHandler() !== Field::EXPORT_SKIP) {
-            $name = $field->getExportName();
-            $ret[$field->getExportName()] = $field->exportValue();
+            $ret[$field->getName()] = $field->exportValue();
          }
       }
       return $ret;

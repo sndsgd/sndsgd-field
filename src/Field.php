@@ -4,19 +4,21 @@ namespace sndsgd;
 
 use \Exception;
 use \InvalidArgumentException;
+use \sndsgd\Arr;
 use \sndsgd\field\Collection;
 use \sndsgd\field\Rule;
 use \sndsgd\field\exeception\DuplicateRuleException;
 use \sndsgd\field\ValidationError;
-use \sndsgd\util\Arr;
 
 
 /**
  * A container for one or more values
+ * 
+ * @todo Allow for setting an array of default values (Field::EXPORT_ARRAY)
  */
 abstract class Field
 {
-   use \sndsgd\event\Target;
+   use \sndsgd\event\Target, \sndsgd\data\Manager;
 
    // available export types
    const EXPORT_NORMAL = 0;
@@ -28,19 +30,19 @@ abstract class Field
     * 
     * @param string $type The type of field to create 
     * @param array $args The arguments provided to the static method
-    * @return sndsgd\field\Field 
+    * @return sndsgd\Field 
     */
    public static function __callStatic($type, array $args)
    {
       $classes = [
-         'bool' => 'sndsgd\\field\\BooleanField',
-         'boolean' => 'sndsgd\\field\\BooleanField',
-         'int' => 'sndsgd\\field\\IntegerField',
-         'integer' => 'sndsgd\\field\\IntegerField',
-         'flt' => 'sndsgd\\field\\FloatField',
-         'float' => 'sndsgd\\field\\FloatField',
-         'str' => 'sndsgd\\field\\StringField',
-         'string' => 'sndsgd\\field\\StringField',
+         'bool' => 'sndsgd\\field\\Boolean',
+         'boolean' => 'sndsgd\\field\\Boolean',
+         'int' => 'sndsgd\\field\\Integer',
+         'integer' => 'sndsgd\\field\\Integer',
+         'flt' => 'sndsgd\\field\\Float',
+         'float' => 'sndsgd\\field\\Float',
+         'str' => 'sndsgd\\field\\String',
+         'string' => 'sndsgd\\field\\String',
       ];
 
       if (!array_key_exists($type, $classes)) {
@@ -50,8 +52,11 @@ abstract class Field
       }
 
       $class = $classes[$type];
-      $fieldName = $args[0];
-      return $class::create($fieldName);
+      $field = $class::create(array_shift($args));
+      if (count($args)) {
+         call_user_func_array([$field, 'addAliases'], $args);
+      }
+      return $field;
    }
 
    /**
@@ -99,12 +104,12 @@ abstract class Field
     */
    protected $rules = [];
 
-   /**
-    * Optional data storage
-    *
-    * @var array.<
-    */
-   protected $options = [];
+   // /**
+   //  * Optional data storage
+   //  *
+   //  * @var array.<
+   //  */
+   // protected $options = [];
 
    /**
     * A custom name to export the field as
@@ -135,7 +140,7 @@ abstract class Field
     * Set the name of the field
     * 
     * @param string $name
-    * @return sndsgd\field\Field
+    * @return sndsgd\Field
     * @throws InvalidArgumentException
     */
    private function setName($name)
@@ -163,7 +168,7 @@ abstract class Field
     * Add one or more aliases to the field
     *
     * @param string $alias,... 
-    * @return sndsgd\field\Field
+    * @return sndsgd\Field
     */
    public function addAliases($alias)
    {
@@ -214,7 +219,7 @@ abstract class Field
     * Set a default value
     * 
     * @param mixed $value
-    * @return sndsgd\field\Field
+    * @return sndsgd\Field
     * @throws InvalidArgumentException If $value is not the appropriate type
     */
    abstract public function setDefault($value);
@@ -227,80 +232,6 @@ abstract class Field
    public function getDefault()
    {
       return $this->defaultValue;
-   }
-
-   /**
-    * Set one or more option values
-    * 
-    * @return sndsgd\Field
-    */
-   public function setOption($key, $value = null)
-   {
-      if (is_array($key)) {
-         foreach ($key as $k => $v) {
-            $this->options[$k] = $v;
-         }
-      }
-      else if ($value === null) {
-         if (!array_key_exists($key, $this->options)) {
-            throw new InvalidArgumentException(
-               "invalid value provided for 'key'; ".
-               "expecting the name of an option to remove as string"
-            );
-         }
-         unset($this->options[$key]);
-      }
-      else {
-         $this->options[$key] = $value;
-      }
-      return $this;
-   }
-
-   /**
-    * Get one or all options
-    *
-    * @param string|null $key The value assoiciated with 
-    * @return string|array|null
-    */
-   public function getOption($key = null)
-   {
-      if ($key === null) {
-         return $this->options;
-      }
-
-      return (array_key_exists($key, $this->options))
-         ? $this->options[$key]
-         : null;
-   }
-
-   /**
-    * Set a name to export the field as
-    * 
-    * @param string $name
-    * @return sndsgd\Field
-    * @throws InvalidArgumentException
-    */
-   public function setExportName($name)
-   {
-      if (!is_string($name)) {
-         throw new InvalidArgumentException(
-            "invalid value provided for 'name'; expecting a string"
-         );
-      }
-      $this->exportName = $name;
-      return $this;
-   }
-
-   /**
-    * Get the name to export the field as
-    * 
-    * @return string
-    */
-   public function getExportName()
-   {
-      return ($this->exportName !== null)
-         ? $this->exportName
-         : $this->name;
    }
 
    /**
@@ -400,7 +331,7 @@ abstract class Field
    }
 
    /**
-    * Get all of the current values
+    * Get all of the current values as an array of values
     * 
     * If no value is currently set, the default value will be returned
     * @return array.<string|integer|float|boolean|null>
@@ -429,16 +360,12 @@ abstract class Field
     */
    public function exportValue()
    {
-      if ($this->exportHandler === self::EXPORT_SKIP) {
-         throw new Exception(
-            "failed to export value for field with export handler set to ".
-            "sndsgd\field\Field::EXPORT_SKIP"
-         );
-      }
-
       $values = $this->getValuesAsArray();
 
-      if ($this->exportHandler === self::EXPORT_NORMAL) {
+      if (
+         $this->exportHandler === self::EXPORT_NORMAL ||
+         $this->exportHandler === self::EXPORT_SKIP
+      ) {
          return (count($values) === 1) ? $values[0] : $values;
       }
       else if ($this->exportHandler === self::EXPORT_ARRAY) {

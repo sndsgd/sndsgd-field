@@ -1,45 +1,57 @@
 <?php
 
-namespace sndsgd\field;
+namespace sndsgd;
 
 use \sndsgd\Event;
-use \sndsgd\Field;
+use \sndsgd\field\String;
+use \sndsgd\field\Collection;
 use \sndsgd\field\rule\Required as RequiredRule;
 use \sndsgd\field\rule\MinValue as MinValueRule;
 use \sndsgd\field\rule\MaxValue as MaxValueRule;
 
 
+/**
+ * @coversDefaultClass \sndsgd\Field
+ */
 class FieldTest extends \PHPUnit_Framework_TestCase
 {
+   /**
+    * @coversNothing
+    */
    public function setUp()
    {
       $this->field = Field::str('test');
    }
 
+   /**
+    * @covers ::__callStatic
+    */
    public function testCallStatic()
    {
       $field = Field::bool('name');
-      $this->assertTrue($field instanceof BooleanField);
-      $field = Field::boolean('name');
-      $this->assertTrue($field instanceof BooleanField);
+      $this->assertInstanceOf('sndsgd\\field\\Boolean', $field);
+      $field = Field::boolean('name', 'n');
+      $this->assertInstanceOf('sndsgd\\field\\Boolean', $field);
+      $this->assertEquals(['n'], $field->getAliases());
 
       $field = Field::int('name');
-      $this->assertTrue($field instanceof IntegerField);
+      $this->assertInstanceOf('sndsgd\\field\\Integer', $field);
       $field = Field::integer('name');
-      $this->assertTrue($field instanceof IntegerField);
+      $this->assertInstanceOf('sndsgd\\field\\Integer', $field);
 
       $field = Field::flt('name');
-      $this->assertTrue($field instanceof FloatField);
+      $this->assertInstanceOf('sndsgd\\field\\Float', $field);
       $field = Field::float('name');
-      $this->assertTrue($field instanceof FloatField);
+      $this->assertInstanceOf('sndsgd\\field\\Float', $field);
 
       $field = Field::str('name');
-      $this->assertTrue($field instanceof StringField);
+      $this->assertInstanceOf('sndsgd\\field\\String', $field);
       $field = Field::string('name');
-      $this->assertTrue($field instanceof StringField);
+      $this->assertInstanceOf('sndsgd\\field\\String', $field);
    }
 
    /**
+    * @covers ::__callStatic
     * @expectedException InvalidArgumentException
     */
    public function testCallStaticTypeException()
@@ -48,6 +60,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
    }
 
    /**
+    * @covers ::__callStatic
     * @expectedException InvalidArgumentException
     */
    public function testCallStaticNameException()
@@ -71,6 +84,19 @@ class FieldTest extends \PHPUnit_Framework_TestCase
       $this->assertEquals($result, 'test');
    }
 
+   /**
+    * @covers ::setName
+    * @expectedException InvalidArgumentException
+    */
+   public function testSetNameException()
+   {
+      new String(42);
+   }
+
+   /**
+    * @covers ::setDescription
+    * @covers ::getDescription
+    */
    public function testSetGetDescription()
    {
       $desc = 'just a test description';
@@ -79,6 +105,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
    }
 
    /**
+    * @covers ::setDescription
     * @expectedException InvalidArgumentException
     */
    public function testSetDescriptionException()
@@ -86,47 +113,10 @@ class FieldTest extends \PHPUnit_Framework_TestCase
       $this->field->setDescription(42);
    }
 
-   public function testSetAndGetOption()
-   {
-      $data = ['one' => 1, 'two' => 2];
-      $this->field->setOption($data);
-      $this->assertEquals($data, $this->field->getOption());
-
-      # remove the option 2 (value defaults to null)
-      $this->field->setOption('two');
-      $this->assertEquals(['one' => 1], $this->field->getOption());
-      $this->assertEquals(1, $this->field->getOption('one'));
-
-
-      $this->field->setOption('three', 3);
-      $this->assertEquals(3, $this->field->getOption('three'));
-      $this->assertEquals(1, $this->field->getOption('one'));
-      $this->assertNull($this->field->getOption('two'));
-   }
-
    /**
-    * @expectedException InvalidArgumentException
+    * @covers ::setExportHandler
+    * @covers ::exportValue
     */
-   public function testSetOptionException()
-   {
-      $this->field->setOption('doesnt-exist');
-   }
-
-   public function testSetGetExportName()
-   {
-      $this->field->setExportName('shrt');
-      $this->assertEquals('shrt', $this->field->getExportName());
-   }
-
-   /**
-    * @expectedException InvalidArgumentException
-    */
-   public function testSetExportNameException()
-   {
-      $this->field->setExportName(42);
-   }
-
-
    public function testSetExportNormal()
    {
       $this->field->addValue(42);
@@ -136,6 +126,10 @@ class FieldTest extends \PHPUnit_Framework_TestCase
       $this->assertEquals([42, 84], $this->field->exportValue());
    }
 
+   /**
+    * @covers ::setExportHandler
+    * @covers ::exportValue
+    */
    public function testSetExportArray()
    {
       $this->field->addValue(42);
@@ -146,15 +140,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
    }
 
    /**
-    * @expectedException Exception
-    */
-   public function testSetExportSkipException()
-   {
-      $this->field->setExportHandler(Field::EXPORT_SKIP);
-      $this->field->exportValue();
-   }
-
-   /**
+    * @covers ::setExportHandler
     * @expectedException InvalidArgumentException
     */
    public function testSetExportHandlerException()
@@ -162,6 +148,11 @@ class FieldTest extends \PHPUnit_Framework_TestCase
       $this->field->setExportHandler([]);
    }
 
+   /**
+    * @covers ::addValue
+    * @covers ::setExportHandler
+    * @covers ::exportValue
+    */
    public function testExportClosure()
    {
       $this->field->addValue(42);
@@ -178,6 +169,9 @@ class FieldTest extends \PHPUnit_Framework_TestCase
       $this->assertEquals([43,11], $this->field->exportValue());
    }
 
+   /**
+    * @covers ::hasValue
+    */
    public function testHasValue()
    {
       $this->assertFalse($this->field->hasValue());
@@ -185,6 +179,10 @@ class FieldTest extends \PHPUnit_Framework_TestCase
       $this->assertTrue($this->field->hasValue());
    }
 
+   /**
+    * @covers ::setValue
+    * @covers ::getValue
+    */
    public function testGetValue()
    {
       $val = 'default-value';
@@ -192,6 +190,10 @@ class FieldTest extends \PHPUnit_Framework_TestCase
       $this->assertEquals($val, $this->field->getValue());
    }
 
+   /**
+    * @covers ::setValue
+    * @covers ::exportValue
+    */
    public function testSetValue()
    {
       $this->field->setValue(42);
@@ -206,6 +208,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
    }
 
    /**
+    * @covers ::addRules
     * @expectedException InvalidArgumentException
     */
    public function testAddRulesNotRuleException()
@@ -214,6 +217,7 @@ class FieldTest extends \PHPUnit_Framework_TestCase
    }
 
    /**
+    * @covers ::addRules
     * @expectedException Exception
     */
    public function testAddRulesDupeRuleException()
@@ -224,6 +228,10 @@ class FieldTest extends \PHPUnit_Framework_TestCase
       );
    }
 
+   /**
+    * @covers ::addRules
+    * @covers ::validate
+    */
    public function testValidateNotRequired()
    {
       $coll = new Collection();
@@ -237,6 +245,10 @@ class FieldTest extends \PHPUnit_Framework_TestCase
       $this->assertEquals(0, $this->field->validate());
    }
 
+   /**
+    * @covers ::addRules
+    * @covers ::getRules
+    */
    public function testGetRules()
    {
       $this->field->addRules(

@@ -9,13 +9,13 @@ use \sndsgd\field\rule\Float as FloatRule;
 /**
  * A field for storing float values
  */
-class FloatField extends \sndsgd\Field
+class Float extends \sndsgd\Field
 {
    /**
     * Create a float field with sensible default rules
     *
     * @param string $name The name of the field
-    * @return sndsgd\field\FloatField
+    * @return sndsgd\field\Float
     */
    public static function create($name)
    {

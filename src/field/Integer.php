@@ -9,13 +9,13 @@ use \sndsgd\field\rule\Integer as IntegerRule;
 /**
  * A field for storing integer values
  */
-class IntegerField extends \sndsgd\Field
+class Integer extends \sndsgd\Field
 {
    /**
     * Create an integer field with sensible default rules
     *
     * @param string $name The name of the field
-    * @return sndsgd\field\IntegerField
+    * @return sndsgd\field\Integer
     */
    public static function create($name)
    {

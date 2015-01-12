@@ -3,19 +3,19 @@
 namespace sndsgd\field;
 
 
-class IntegerFieldTest extends \PHPUnit_Framework_TestCase
+class FloatTest extends \PHPUnit_Framework_TestCase
 {
    public function testConstructor()
    {
-      $field = IntegerField::create('name');
+      $field = Float::create('name');
       $this->assertEquals('name', $field->getName());
    }
 
    public function testSetDefault()
    {
-      $field = IntegerField::create('name');
-      $field->setDefault(42);
-      $this->assertEquals(42, $field->getDefault());
+      $field = Float::create('name');
+      $field->setDefault(4.2);
+      $this->assertEquals(4.2, $field->getDefault());
    }
 
    /**
@@ -23,7 +23,7 @@ class IntegerFieldTest extends \PHPUnit_Framework_TestCase
     */
    public function testSetDefaultException()
    {
-      $field = IntegerField::create('name');
+      $field = Float::create('name');
       $field->setDefault('string');
    }
 }

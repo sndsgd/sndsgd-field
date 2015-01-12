@@ -5,23 +5,23 @@ namespace sndsgd\field\rule;
 use \InvalidArgumentException;
 use \sndsgd\field\Collection;
 use \sndsgd\field\ValidationError;
-use \sndsgd\util\Path;
+use \sndsgd\Path;
 
 
 /**
- * Ensure a path validates using sndsgd\util\Path::test
+ * Ensure a path validates using sndsgd\Path::test
  */
 class PathTest extends \sndsgd\field\Rule
 {
    /**
-    * The bitmask to pass to sndsgd\util\Path::test
+    * The bitmask to pass to sndsgd\Path::test
     *
     * @var integer
     */
    protected $bitmask = 1;
 
    /**
-    * @param string $bitmask The bitmask to pass to sndsgd\util\Path::test
+    * @param string $bitmask The bitmask to pass to sndsgd\Path::test
     */
    public function __construct($bitmask = null)
    {

@@ -4,7 +4,7 @@ namespace sndsgd\field\rule;
 
 use \sndsgd\field\Collection;
 use \sndsgd\field\ValidationError;
-use \sndsgd\util\Classname as Cname;
+use \sndsgd\Classname as Cname;
 
 
 /**

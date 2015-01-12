@@ -10,13 +10,13 @@ use \sndsgd\field\rule\MaxValueCount as MaxValueCountRule;
 /**
  * A field for storing boolean values
  */
-class BooleanField extends \sndsgd\Field
+class Boolean extends \sndsgd\Field
 {
    /**
     * Create a boolean field with sensible default rules
     *
     * @param string $name The name of the field
-    * @return sndsgd\field\BooleanField
+    * @return sndsgd\field\Boolean
     */
    public static function create($name)
    {

@@ -2,10 +2,8 @@
 
 namespace sndsgd\field\rule;
 
-use \sndsgd\field\ValidationError;
 
-
-class RegexTest extends RuleTestCase
+class RegexTest extends \sndsgd\field\RuleTestCase
 {
    public function test()
    {
