@@ -13,7 +13,7 @@ use \sndsgd\field\ValidationError;
 
 /**
  * A container for one or more values
- * 
+ *
  * @todo Allow for setting an array of default values (Field::EXPORT_ARRAY)
  */
 abstract class Field
@@ -27,10 +27,10 @@ abstract class Field
 
    /**
     * Convenience method for creating fields by type
-    * 
-    * @param string $type The type of field to create 
+    *
+    * @param string $type The type of field to create
     * @param array $args The arguments provided to the static method
-    * @return sndsgd\Field 
+    * @return sndsgd\Field
     */
    public static function __callStatic($type, array $args)
    {
@@ -46,13 +46,11 @@ abstract class Field
       ];
 
       if (!array_key_exists($type, $classes)) {
-         throw new InvalidArgumentException(
-            "unknown field type '$type'; "
-         );
+         throw new InvalidArgumentException("unknown field type '$type'");
       }
 
       $class = $classes[$type];
-      $field = $class::create(array_shift($args));
+      $field = new $class(array_shift($args));
       if (count($args)) {
          call_user_func_array([$field, 'addAliases'], $args);
       }
@@ -61,7 +59,7 @@ abstract class Field
 
    /**
     * A human readable name for the field
-    * 
+    *
     * @var string
     */
    protected $name;
@@ -83,8 +81,8 @@ abstract class Field
    protected $description = 'no description provided';
 
    /**
-    * The default value
-    * 
+    * A default value to use if no values are added
+    *
     * @var string|integer|float|null
     */
    protected $defaultValue = null;
@@ -99,36 +97,28 @@ abstract class Field
 
    /**
     * Validation rules
-    * 
+    *
     * @var array.<string,sndsgd\field\Rule>
     */
    protected $rules = [];
 
-   // /**
-   //  * Optional data storage
-   //  *
-   //  * @var array.<
-   //  */
-   // protected $options = [];
-
    /**
     * A custom name to export the field as
-    * 
+    *
     * @var string|null
     */
    protected $exportName = null;
 
    /**
     * A custom handler for exporting the field
-    * 
+    *
     * @var integer|callable
     */
    protected $exportHandler = self::EXPORT_NORMAL;
 
-
    /**
     * Create a new field instance
-    * 
+    *
     * @param string $name The name of the field
     */
    public function __construct($name)
@@ -138,7 +128,7 @@ abstract class Field
 
    /**
     * Set the name of the field
-    * 
+    *
     * @param string $name
     * @return sndsgd\Field
     * @throws InvalidArgumentException
@@ -156,7 +146,7 @@ abstract class Field
 
    /**
     * Get the field name
-    * 
+    *
     * @return string
     */
    public function getName()
@@ -167,7 +157,7 @@ abstract class Field
    /**
     * Add one or more aliases to the field
     *
-    * @param string $alias,... 
+    * @param string $alias,...
     * @return sndsgd\Field
     */
    public function addAliases($alias)
@@ -180,7 +170,7 @@ abstract class Field
 
    /**
     * Get all the aliases for the field
-    * 
+    *
     * @return array.<string>
     */
    public function getAliases()
@@ -190,7 +180,7 @@ abstract class Field
 
    /**
     * Set a human readable description describing the field
-    * 
+    *
     * @param string $description
     * @return sndsgd\Field
     */
@@ -207,7 +197,7 @@ abstract class Field
 
    /**
     * Get the human readable description
-    * 
+    *
     * @return string
     */
    public function getDescription()
@@ -217,7 +207,7 @@ abstract class Field
 
    /**
     * Set a default value
-    * 
+    *
     * @param mixed $value
     * @return sndsgd\Field
     * @throws InvalidArgumentException If $value is not the appropriate type
@@ -226,7 +216,7 @@ abstract class Field
 
    /**
     * Get a default value
-    * 
+    *
     * @return mixed
     */
    public function getDefault()
@@ -236,7 +226,7 @@ abstract class Field
 
    /**
     * Set the method by which to export the value
-    * 
+    *
     * @param integer|callable $type
     * @return sndsgd\Field
     * @throws InvalidArgumentException If $type is not valid
@@ -244,13 +234,13 @@ abstract class Field
    public function setExportHandler($type)
    {
       if (
-         is_callable($type) || 
+         is_callable($type) ||
          $type === self::EXPORT_NORMAL ||
          $type === self::EXPORT_ARRAY ||
          $type === self::EXPORT_SKIP
       ) {
          $this->exportHandler = $type;
-         return $this;   
+         return $this;
       }
 
       throw new InvalidArgumentException(
@@ -271,7 +261,7 @@ abstract class Field
 
    /**
     * Add a value
-    * 
+    *
     * @param string|number $value The value to add
     * @return sndsgd\Field
     */
@@ -286,8 +276,8 @@ abstract class Field
 
    /**
     * Set one or all values
-    * 
-    * @param string|integer|float|array.<string|integer|float> $value 
+    *
+    * @param string|integer|float|array.<string|integer|float> $value
     * @param integer|null $index
     * @return sndsgd\Field
     */
@@ -297,7 +287,7 @@ abstract class Field
          $this->value = Arr::cast($value);
       }
       else {
-         $this->value[$index] = $value;   
+         $this->value[$index] = $value;
       }
       return $this;
    }
@@ -315,7 +305,7 @@ abstract class Field
 
    /**
     * Get a single value
-    * 
+    *
     * @param integer $index
     * @return number|string|null
     */
@@ -332,7 +322,7 @@ abstract class Field
 
    /**
     * Get all of the current values as an array of values
-    * 
+    *
     * If no value is currently set, the default value will be returned
     * @return array.<string|integer|float|boolean|null>
     */
@@ -343,7 +333,7 @@ abstract class Field
 
    /**
     * Get the number of values in the field (ignore the initial null)
-    * 
+    *
     * @return integer
     */
    public function getValueCount()
@@ -378,8 +368,8 @@ abstract class Field
 
    /**
     * Add one or more validation rules to the field
-    * 
-    * @param sndsgd\field\Rule,... $rule 
+    *
+    * @param sndsgd\field\Rule,... $rule
     * @return sndsgd\Field The field instance
     */
    public function addRules($rule)
@@ -408,12 +398,12 @@ abstract class Field
             $this->rules[$ruleClass] = $rule;
          }
       }
-      return $this;  
+      return $this;
    }
 
    /**
     * Determine whether or not the field has a particular rule
-    * 
+    *
     * @param string $ruleName The name of the rule
     * @return boolean
     */
@@ -434,13 +424,14 @@ abstract class Field
 
    /**
     * Validate all the values in the field
-    * 
+    *
     * @param sndsgd\field\Collection|null $collection A field collection
-    * @return integer The number of validation errors encountered
+    * @return boolean|sndsgd\field\ValidationError
+    * @return boolean:true If all values are valid
+    * @return sndsgd\field\ValidationError If a value failed to validate
     */
    public function validate(Collection $collection = null)
    {
-      $ret = 0;
       $values = $this->getValuesAsArray();
       $len = count($values);
 
@@ -455,21 +446,16 @@ abstract class Field
          foreach ($this->rules as $name => $rule) {
             $result = $rule->validate($value, $this->name, $i, $collection);
             if ($result instanceof ValidationError) {
-               if ($collection !== null) {
-                  $collection->addValidationError($result);   
-               }
-               $ret++;
-               break;
+               return $result;
             }
-
             # if the validation method returned a new value, update it
-            if ($result !== $value) {
+            else if ($result !== $value) {
                $value = $result;
                $this->setValue($result, $i);
             }
          }
       }
-      return $ret;
+      return true;
    }
 }
 

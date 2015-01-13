@@ -3,19 +3,24 @@
 namespace sndsgd\field;
 
 
+/**
+ * @coversDefaultClass \sndsgd\field\String
+ */
 class StringTest extends \PHPUnit_Framework_TestCase
 {
-   public function testConstructor()
+   public function setUp()
    {
-      $field = String::create('name');
-      $this->assertEquals('name', $field->getName());
+      $this->field = new String('name');
    }
 
+   /**
+    * @covers ::setDefault
+    * @covers ::getDefault
+    */
    public function testSetDefault()
    {
-      $field = String::create('name');
-      $field->setDefault('Russell');
-      $this->assertEquals('Russell', $field->getDefault());
+      $this->field->setDefault('Russell');
+      $this->assertEquals('Russell', $this->field->getDefault());
    }
 
    /**
@@ -23,8 +28,7 @@ class StringTest extends \PHPUnit_Framework_TestCase
     */
    public function testSetDefaultException()
    {
-      $field = String::create('name');
-      $field->setDefault(0);
+      $this->field->setDefault(0);
    }
 }
 

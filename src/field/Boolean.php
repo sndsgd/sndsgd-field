@@ -13,27 +13,23 @@ use \sndsgd\field\rule\MaxValueCount as MaxValueCountRule;
 class Boolean extends \sndsgd\Field
 {
    /**
-    * Create a boolean field with sensible default rules
-    *
-    * @param string $name The name of the field
-    * @return sndsgd\field\Boolean
-    */
-   public static function create($name)
-   {
-      $field = new self($name);
-      $field->addRules(
-         new MaxValueCountRule(1),
-         new BooleanRule()
-      );
-      return $field;
-   }
-
-   /**
     * The default value for boolean fields should always be false
     *
     * @var boolean
     */
    protected $defaultValue = false;
+
+   /**
+    * {@inheritdoc}
+    */
+   public function __construct($name)
+   {
+      parent::__construct($name);
+      $this->addRules(
+         new MaxValueCountRule(1),
+         new BooleanRule()
+      );
+   }
 
    /**
     * {@inheritdoc}

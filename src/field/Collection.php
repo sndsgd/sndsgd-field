@@ -163,11 +163,13 @@ class Collection
    /**
     * Validate the all the fields
     * 
-    * @return boolean True if no errors were encountered, otherwise false
+    * @return boolean
+    * @return boolean:true All fields validated successfully
+    * @return boolean:false One or more fields failed to validate
     */
    public function validate()
    {
-      # note: addValues adds validation errors for unknown values
+      # addValues adds validation errors for unknown values
       $errs = count($this->validationErrors);
 
       $dataKey = constant(get_called_class().'::EVENT_DATA_KEY');
@@ -176,7 +178,11 @@ class Collection
          return false;
       }
       foreach ($this->fields as $field) {
-         $errs += $field->validate($this);
+         $result = $field->validate($this);
+         if ($result instanceof ValidationError) {
+            $this->addValidationError($result);
+            $errs++;
+         }
       }
       return (
          $errs > 0 ||
@@ -260,7 +266,7 @@ class Collection
    /**
     * Get all field values using their respective export handlers
     *
-    * @return  array.<string,mixed>
+    * @return array.<string,mixed>
     */
    public function exportValues()
    {

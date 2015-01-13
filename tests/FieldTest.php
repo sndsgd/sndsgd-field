@@ -3,7 +3,7 @@
 namespace sndsgd;
 
 use \sndsgd\Event;
-use \sndsgd\field\String;
+use \sndsgd\field\String as StringField;
 use \sndsgd\field\Collection;
 use \sndsgd\field\rule\Required as RequiredRule;
 use \sndsgd\field\rule\MinValue as MinValueRule;
@@ -90,7 +90,17 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     */
    public function testSetNameException()
    {
-      new String(42);
+      new StringField(42);
+   }
+
+   /**
+    * @covers ::getName
+    */
+   public function testGetName()
+   {
+      $name = 'test';
+      $field = Field::string($name);
+      $this->assertEquals($name, $field->getName());
    }
 
    /**
@@ -234,31 +244,37 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     */
    public function testValidateNotRequired()
    {
-      $coll = new Collection();
-      $coll->addFields($this->field);
       $this->field->addRules(
          new MinValueRule(1),
          new MaxValueRule(10)
       );
 
       // no value, but not required (valid)
-      $this->assertEquals(0, $this->field->validate());
+      $this->assertTrue($this->field->validate());
    }
 
    /**
+    * Whenever a required rule is added to a field, it becomes the first rule
+    * 
     * @covers ::addRules
     * @covers ::getRules
     */
-   public function testGetRules()
+   public function testAddRequiredRuleOrder()
    {
-      $this->field->addRules(
-         new RequiredRule,
-         new MinValueRule(1),
-         new MaxValueRule(10)
-      );
+      $field = new StringField('test');
+      $rules = $field->getRules();
+      $this->assertCount(0, $rules);
 
-      # the string field starts with a NotBoolean rule
-      $this->assertEquals(4, count($this->field->getRules()));
+      $field->addRules(new MinValueRule(1));
+      $rules = $field->getRules();
+      $this->assertCount(1, $rules);
+
+      $field->addRules(new RequiredRule);
+      $rules = $field->getRules();
+      $this->assertCount(2, $rules);
+
+      $this->assertInstanceOf('sndsgd\\field\\rule\\Required', array_shift($rules));
+      $this->assertInstanceOf('sndsgd\\field\\rule\\MinValue', array_shift($rules));
    }
 }
 

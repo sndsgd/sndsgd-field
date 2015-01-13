@@ -12,16 +12,12 @@ use \sndsgd\field\rule\Integer as IntegerRule;
 class Integer extends \sndsgd\Field
 {
    /**
-    * Create an integer field with sensible default rules
-    *
-    * @param string $name The name of the field
-    * @return sndsgd\field\Integer
+    * {@inheritdoc}
     */
-   public static function create($name)
+   public function __construct($name)
    {
-      $field = new self($name);
-      $field->addRules(new IntegerRule);
-      return $field;
+      parent::__construct($name);
+      $this->addRules(new IntegerRule);
    }
 
    /**

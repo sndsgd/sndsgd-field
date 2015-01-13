@@ -3,19 +3,24 @@
 namespace sndsgd\field;
 
 
+/**
+ * @coversDefaultClass \sndsgd\field\Boolean
+ */
 class BooleanTest extends \PHPUnit_Framework_TestCase
 {
-   public function testConstructor()
+   public function setUp()
    {
-      $field = Boolean::create('name');
-      $this->assertEquals('name', $field->getName());
+      $this->field = new Boolean('name');
    }
 
+   /**
+    * @covers ::setDefault
+    * @covers ::getDefault
+    */
    public function testSetDefault()
    {
-      $field = Boolean::create('name');
-      $field->setDefault(true);
-      $this->assertTrue($field->getDefault());
+      $this->field->setDefault(true);
+      $this->assertTrue($this->field->getDefault());
    }
 
    /**
@@ -23,8 +28,7 @@ class BooleanTest extends \PHPUnit_Framework_TestCase
     */
    public function testSetDefaultException()
    {
-      $field = Boolean::create('name');
-      $field->setDefault('string');
+      $this->field->setDefault('string');
    }
 }
 

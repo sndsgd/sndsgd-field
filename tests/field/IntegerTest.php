@@ -3,19 +3,24 @@
 namespace sndsgd\field;
 
 
+/**
+ * @coversDefaultClass \sndsgd\field\Integer
+ */
 class IntegerTest extends \PHPUnit_Framework_TestCase
 {
-   public function testConstructor()
+   public function setUp()
    {
-      $field = Integer::create('name');
-      $this->assertEquals('name', $field->getName());
+      $this->field = new Integer('name');
    }
 
+   /**
+    * @covers ::setDefault
+    * @covers ::getDefault
+    */
    public function testSetDefault()
    {
-      $field = Integer::create('name');
-      $field->setDefault(42);
-      $this->assertEquals(42, $field->getDefault());
+      $this->field->setDefault(42);
+      $this->assertEquals(42, $this->field->getDefault());
    }
 
    /**
@@ -23,8 +28,7 @@ class IntegerTest extends \PHPUnit_Framework_TestCase
     */
    public function testSetDefaultException()
    {
-      $field = Integer::create('name');
-      $field->setDefault('string');
+      $this->field->setDefault('string');
    }
 }
 

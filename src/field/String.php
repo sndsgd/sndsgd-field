@@ -12,19 +12,6 @@ use \sndsgd\field\rule\NotBoolean as NotBooleanRule;
 class String extends \sndsgd\Field
 {
    /**
-    * Create a string field with sensible default rules
-    *
-    * @param string $name The name of the field
-    * @return sndsgd\field\String
-    */
-   public static function create($name, $default = null)
-   {
-      $field = new self($name);
-      $field->addRules(new NotBooleanRule());
-      return $field;
-   }
-
-   /**
     * {@inheritdoc}
     * @param string $value
     */

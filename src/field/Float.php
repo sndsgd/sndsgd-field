@@ -12,16 +12,12 @@ use \sndsgd\field\rule\Float as FloatRule;
 class Float extends \sndsgd\Field
 {
    /**
-    * Create a float field with sensible default rules
-    *
-    * @param string $name The name of the field
-    * @return sndsgd\field\Float
+    * {@inheritdoc}
     */
-   public static function create($name)
+   public function __construct($name)
    {
-      $field = new self($name);
-      $field->addRules(new FloatRule);
-      return $field;
+      parent::__construct($name);
+      $this->addRules(new FloatRule);
    }
 
    /**
