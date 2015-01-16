@@ -8,7 +8,7 @@ use \sndsgd\field\rule\DateStringRule;
 
 
 /**
- * A field for storing integer values
+ * A field for storing DateTime values
  */
 class DateField extends \sndsgd\Field
 {
