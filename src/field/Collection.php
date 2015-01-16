@@ -15,7 +15,7 @@ use \sndsgd\field\collection\DuplicateFieldAliasException;
  */
 class Collection implements \Countable
 {
-   use \sndsgd\event\Target, \sndsgd\data\Manager;
+   use \sndsgd\data\Manager;
 
    /**
     * The data event key for the collection object whenever an event is
@@ -65,6 +65,32 @@ class Collection implements \Countable
    public function count()
    {
       return count($this->fields);
+   }
+
+   /**
+    * Perform actions immediately before validation
+    *
+    * If this method returns anything other than boolean true, field 
+    * validation will be skipped, and validation will fail
+    * Override this method in a subclass if you need to pre-validate state 
+    * @return boolean
+    */
+   protected function beforeValidate()
+   {
+      return true;
+   }
+
+   /**
+    * Perform actions immediately after validation
+    *
+    * If this method returns anything other than boolean true validation 
+    * will fail
+    * Override this method in a subclass if you need to post-validate state 
+    * @return boolean
+    */
+   protected function afterValidate()
+   {
+      return true;
    }
 
    /**
@@ -194,7 +220,7 @@ class Collection implements \Countable
 
       $dataKey = constant(get_called_class().'::EVENT_DATA_KEY');
 
-      if ($this->fire('beforeValidate', [$dataKey => $this]) === false) {
+      if ($this->beforeValidate() !== true) {
          return false;
       }
       foreach ($this->fields as $field) {
@@ -207,7 +233,7 @@ class Collection implements \Countable
       }
       return (
          $errs > 0 ||
-         $this->fire('afterValidate', [$dataKey => $this]) === false ||
+         $this->afterValidate() !== true ||
          count($this->errors) > 0
       ) ? false : true;
    }

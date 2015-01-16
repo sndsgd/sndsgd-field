@@ -10,6 +10,23 @@ use \sndsgd\field\StringField;
 use \sndsgd\field\rule\RequiredRule;
 
 
+class BeforeValidateFailCollection extends Collection
+{
+   protected function beforeValidate()
+   {
+      return false;
+   }
+}
+
+class AfterValidateFailCollection extends Collection
+{
+   protected function AfterValidate()
+   {
+      return false;
+   }
+}
+
+
 /**
  * @coversDefaultClass \sndsgd\field\Collection
  */
@@ -121,51 +138,15 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
       ], $this->coll->getData());
    }
 
-
-   public function testValidationEvents()
-   {
-      $beforeValidate = \Closure::bind(function(Event $ev) {
-         $collection = $ev->getData('collection');
-         $errors = $collection->getErrors();
-         $this->assertEquals(0, count($errors));
-      }, $this);
-
-      $afterValidate = \Closure::bind(function(Event $ev) {
-         $collection = $ev->getData('collection');
-         $errors = $collection->getErrors();
-         $this->assertEquals(5, count($errors));
-      }, $this);
-
-      $this->coll->on('beforeValidate', $beforeValidate);
-      $this->coll->on('afterValidate', $afterValidate);
-
-      $this->assertFalse($this->coll->validate());
-   }
-
    public function testBeforeValidateFail()
    {
-      $coll = new Collection;
-      $coll->on('beforeValidate', function(Event $ev) {
-         return false;
-      });
+      $coll = new BeforeValidateFailCollection;
       $this->assertFalse($coll->validate());
    }
 
    public function testAfterValidateFail()
    {
-      $coll = new Collection;
-      $coll->on('afterValidate', function(Event $ev) {
-         return false;
-      });
-      $this->assertFalse($coll->validate());
-
-      $coll = new Collection;
-      $coll->on('afterValidate', function(Event $ev) {
-         $coll = $ev->getData('collection');
-         $err = new Error('something went wrong', '');
-         $coll->addError($err);
-         return true;
-      });
+      $coll = new AfterValidateFailCollection;
       $this->assertFalse($coll->validate());
    }
 
