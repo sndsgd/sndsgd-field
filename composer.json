@@ -16,7 +16,7 @@
    },
    "require": {
       "php": ">=5.4.0",
-      "sndsgd/util": "~0.5",
+      "sndsgd/util": "~0.5.1",
       "sndsgd/event": "~0.5"
    },
    "require-dev": {
