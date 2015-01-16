@@ -4,7 +4,10 @@ namespace sndsgd\field;
 
 use \sndsgd\Event;
 use \sndsgd\Field;
-use \sndsgd\field\rule\Required as RequiredRule;
+use \sndsgd\field\BooleanField;
+use \sndsgd\field\IntegerField;
+use \sndsgd\field\StringField;
+use \sndsgd\field\rule\RequiredRule;
 
 
 /**
@@ -15,22 +18,20 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
    protected function setUp()
    {
       $this->coll = new Collection();
-      $this->coll->addFields(
-         Field::str('title')
+      $this->coll->addFields([
+         (new StringField('title'))
             ->addAliases('t')
-            ->addRules(new RequiredRule),
-         Field::str('camera')
+            ->addRule(new RequiredRule),
+         (new StringField('camera'))
             ->addAliases('c')
-            ->addRules(new RequiredRule),
-         [
-            Field::int('image-width')
-               ->addRules(new RequiredRule),
-            Field::int('image-height')
-               ->addRules(new RequiredRule),
-            Field::str('image-format')
-               ->addRules(new RequiredRule)
-         ]
-      );
+            ->addRule(new RequiredRule),
+         (new IntegerField('image-width'))
+            ->addRule(new RequiredRule),
+         (new IntegerField('image-height'))
+            ->addRule(new RequiredRule),
+         (new StringField('image-format'))
+            ->addRule(new RequiredRule)
+      ]);
 
       $this->values = [
          'title' => ['my title', 'another title'],
@@ -46,44 +47,56 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
     */
    public function testAddFieldsConstructor()
    {
-      $coll = new Collection([ Field::boolean('test') ]);
+      $coll = new Collection([ new BooleanField('test') ]);
       $field = $coll->getField('test');
-      $this->assertInstanceOf('sndsgd\\field\\Boolean', $field);
-
+      $this->assertInstanceOf('sndsgd\\field\\BooleanField', $field);
    }
 
    /**
-    * @expectedException Exception
+    * @expectedException \sndsgd\field\collection\DuplicateFieldNameException
     */
-   public function testaddFieldsNameException()
+   public function testAddFieldNameException()
    {
-      $this->coll->addFields(Field::int('title'));
+      $this->coll->addField(new IntegerField('title'));
    }
 
    /**
-    * @expectedException Exception
+    * @expectedException \sndsgd\field\collection\DuplicateFieldAliasException
     */
-   public function testaddFieldsAliasException()
+   public function testAddFieldAliasException()
    {
-      $this->coll->addFields(Field::int('toobie')->addAliases('t'));
+      $this->coll->addField((new IntegerField('toobie'))->addAliases('t'));
+   }
+
+   public function testCount()
+   {
+      $this->assertCount(5, $this->coll);
+   }
+
+   public function testRemoveField()
+   {
+      $field = (new StringField('remove-me'))->addAliases('rm');
+      $this->coll->addField($field);
+      $this->assertTrue($this->coll->removeField('remove-me'));
+      $this->coll->addField($field);
+      $this->assertTrue($this->coll->removeField('rm'));
+      $this->assertFalse($this->coll->removeField('rm'));
    }
 
    public function testGetField()
    {
-      $this->assertTrue($this->coll->getField('title') !== null);
-      $this->assertTrue($this->coll->getField('camera') !== null);
-      $this->assertTrue($this->coll->getField('image-width') !== null);
-      $this->assertTrue($this->coll->getField('image-height') !== null);
-      $this->assertTrue($this->coll->getField('image-format') !== null);
-      $this->assertTrue($this->coll->getField('doesnt-exist') === null);
+      # get by name
+      $field = $this->coll->getField('title');
+      $this->assertEquals('title', $field->getName());
+
+      # get by alias
+      $field = $this->coll->getField('t');
+      $this->assertEquals('title', $field->getName());
    }
 
    public function testGetFields()
    {
-      $fields = $this->coll->getFields();
-      foreach ($fields as $name => $field) {
-         $this->assertEquals($field, $this->coll->getField($name));
-      }
+      $this->assertCount(5, $this->coll->getFields());
    }
 
    public function testSetGetData()
@@ -113,13 +126,13 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
    {
       $beforeValidate = \Closure::bind(function(Event $ev) {
          $collection = $ev->getData('collection');
-         $errors = $collection->getValidationErrors();
+         $errors = $collection->getErrors();
          $this->assertEquals(0, count($errors));
       }, $this);
 
       $afterValidate = \Closure::bind(function(Event $ev) {
          $collection = $ev->getData('collection');
-         $errors = $collection->getValidationErrors();
+         $errors = $collection->getErrors();
          $this->assertEquals(5, count($errors));
       }, $this);
 
@@ -149,31 +162,35 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
       $coll = new Collection;
       $coll->on('afterValidate', function(Event $ev) {
          $coll = $ev->getData('collection');
-         $err = new ValidationError('something went wrong', '', 'name', 0);
-         $coll->addValidationError($err);
+         $err = new Error('something went wrong', '');
+         $coll->addError($err);
          return true;
       });
       $this->assertFalse($coll->validate());
    }
 
-   public function testValidationErrors()
+   public function testErrors()
    {
-      $this->assertFalse($this->coll->hasValidationErrors());
+      $this->assertFalse($this->coll->hasErrors());
 
-      $ve1 = new ValidationError('enter a title', '', 'title', 0);
-      $count = $this->coll->addValidationError($ve1);
-      $this->assertEquals(1, $count);
-      $this->assertTrue($this->coll->hasValidationErrors());
-      $this->assertEquals([$ve1], $this->coll->getValidationErrors('title'));
+      $titleField = new StringField('title');
+      $cameraField = new StringField('camera');
 
-      $ve2 = new ValidationError('enter a camera', '', 'camera', 0);
-      $count = $this->coll->addValidationError($ve2, true);
-      $this->assertEquals(2, $count);
-      $this->assertTrue($this->coll->hasValidationErrors());
+      $e1 = new Error('enter a title');
+      $e1->setName($titleField->getName());
+      $this->assertEquals(1, $this->coll->addError($e1));
+      $this->assertTrue($this->coll->hasErrors());
+      $this->assertEquals([$e1], $this->coll->getErrors('title'));
+
+      # create another error, and prepend it to the array of errors
+      $e2 = new Error('enter a camera');
+      $e1->setName($cameraField->getName());
+      $this->assertEquals(2, $this->coll->addError($e2, true));
+      $this->assertTrue($this->coll->hasErrors());
       
-      $errors = $this->coll->getValidationErrors();
-      $this->assertEquals($ve1, $errors[1]);
-      $this->assertEquals($ve2, $errors[0]);
+      $errors = $this->coll->getErrors();
+      $this->assertEquals($e1, $errors[1]);
+      $this->assertEquals($e2, $errors[0]);
    }
 
    public function testAddValues()
@@ -184,21 +201,20 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
    public function testAddValuesWithNonExistingField()
    {
+      # use 2 values to ensure the
       $this->coll->addValues(array_merge($this->values, [
-         'does-not-exist' => 1
+         'does-not-exist' => [1,2]
       ]));
       $this->assertEquals($this->values, $this->coll->exportValues());
-      $this->assertTrue($this->coll->hasValidationErrors());
-      $errors = $this->coll->getValidationErrors();
+      $this->assertTrue($this->coll->hasErrors());
+      $errors = $this->coll->getErrors();
       $this->assertEquals(1, count($errors));
    }
 
    public function testValidate()
    {
-      $result = $this->coll->validate();
-      $this->assertFalse($result);
-      $errors = $this->coll->getValidationErrors();
-      $this->assertEquals(5, count($errors));
+      $this->assertFalse($this->coll->validate());
+      $this->assertCount(5, $this->coll->getErrors());
    }
 
    public function testValidate2()
@@ -208,10 +224,8 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
          'image-height' => 768,
          'image-format' => 'jpeg'
       ]);
-      $result = $this->coll->validate();
-      $this->assertFalse($result);
-      $errors = $this->coll->getValidationErrors();
-      $this->assertEquals(2, count($errors));
+      $this->assertFalse($this->coll->validate());
+      $this->assertCount(2, $this->coll->getErrors());
    }
 
    public function testExportFieldValue()

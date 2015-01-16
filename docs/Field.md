@@ -1,17 +1,18 @@
 # sndsgd\Field
 
-Instances of `sndsgd\Field` are used to store values, validation rules, and perform validation and/or formatting of values. 
+Instances of `sndsgd\Field` are used to store values, rules, and perform validation and/or formatting of values. 
 
 
 
 ## Field types
 
-When creating a field, use the appropriate class for the type of value you are expecting. The following types are included by default, and you can subclass `sndsgd\Field` to create your own.
+The following types are included by default, and you can subclass `sndsgd\Field` to create your own.
 
-- ```sndsgd\field\Boolean```
-- ```sndsgd\field\Float```
-- ```sndsgd\field\Integer```
-- ```sndsgd\field\String```
+- ```sndsgd\field\BooleanField```
+- ```sndsgd\field\FloatField```
+- ```sndsgd\field\IntegerField```
+- ```sndsgd\field\StringField```
+- ```sndsgd\field\DateField```
 
 
 
@@ -20,7 +21,7 @@ When creating a field, use the appropriate class for the type of value you are e
 To create a field, just pass the name of the field to its constructor:
 
 ```php
-$field = new \sndsgd\field\Integer('id');
+$field = new \sndsgd\field\IntegerField('id');
 ```
 
 Fields can also have aliases, which become useful when dealing with a collection of fields. To set an alias, call `addAliases()`:
@@ -29,23 +30,11 @@ Fields can also have aliases, which become useful when dealing with a collection
 $field->addAliases('i');
 ```
 
-For convenience, the process of creating a field with an alias can be completed in a single call to a static method on `sndsgd\Field` named after the field type:
 
-*Example: creating an integer field named 'id' with an alias 'i' using the longhand and shorthand methods:*
-
-```php
-$f1 = new \sndsgd\field\Integer('id');
-$f1->addAliases('i');
-$f2 = \sndsgd\Field::integer('id', 'i');
-var_dump($f1 == $f2);
-// => bool(true)
-```
 
 ## Setting & adding values
 
-To set a field's value, call `setValue()`. To add additional values, call `addValue()`.
-
-> Note: calling `setValue()` replaces all values with the new value.
+To set a field's value(s), call `setValue()`. To add additional values, call `addValue()`. 
 
 ```php
 $field->setValue(1);
@@ -54,35 +43,32 @@ $field->addValue(2);
 
 
 
+## Rules
+
+Instances of `sndsgd\field\Rule` are used for validating and/or formatting field values, and can be added to a field using `addRule()` or `addRules()`.
+
+> Note: a field's constructor may add rules to the field when it is created. For example, the `sndsgd\field\IntegerField` constructor adds `sndsgd\field\rule\IntegerRule` to every instance it creates.
+
+> Note: if you add `sndsgd\field\rule\RequiredRule` to a field's array of rules, it will always prepended to the array.
+
+
+```
+$field->addRule(new \sndsgd\field\rule\MinValue(1));
+```
+
+
+
 ## Validation/Formatting
 
-All values in a field are validated/formatted when you call `validate()`. If validation fails, an instance of `sndsgd\field\ValidationError` is returned.
-
-Example: validating a field
+All values in a field are validated/formatted using its rules when you call `validate()`. If validation fails, you can retrieve an instance of `sndsgd\field\Error` by calling `getError()`.
 
 ```php
-$result = $field->validate();
-if ($result instanceof ValidationError) {
-   echo 'Error: '.$result->getMessage().PHP_EOL;
-} else {
-   // validation successful
+if ($field->validate() === false) {
+   $error = $field->getError();
 }
-```
-
-
-
-### Rules
-
-Instances of `sndsgd\field\Rule` are used for validating and/or formatting values, and can be added to a field using `addRules()`.
-
-> Note: a field's constructor may add rules to the field when it is created. For example, the `sndsgd\field\Integer` constructor adds `sndsgd\field\rule\Integer` to every instance it creates.
-
-> Note: if you add `sndsgd\field\rule\Required` to a field's list of rules, it will always prepended to the list.
-
-Example: add a rule that ensures a value is at least 1:
-
-```
-$field->addRules(new \sndsgd\field\rule\MinValue(1));
+else {
+   // the value (or values) are all valid
+}
 ```
 
 
@@ -115,8 +101,6 @@ During a field's value export, the value(s) can be updated to meet certain requi
 - `sndsgd\Field::EXPORT_ARRAY` - Forces the exported value to an array or values.
 - `sndsgd\Field::EXPORT_SKIP` - *for use with `sndsgd\Field\Collection`* - Ignore the field while exporting a collection of fields.
 
-*Example: Using a constant to ensure the exported value is an array:*
-
 ```php
 $field->setValue(1);
 $field->setExportHandler(\sndsgd\Field::EXPORT_ARRAY);
@@ -144,40 +128,3 @@ var_dump($field->exportValue());
 // => array(2) { [0] => int(1) [1] => int(2) }
 ```
 
-
-## Example
-
-
-
-```php
-<?php
-
-use \sndsgd\Field;
-use \sndsgd\field\rule\Required as RequiredRule;
-use \sndsgd\field\rule\MinValue as MinValueRule;
-use \sndsgd\field\ValidationError;
-
-$_GET = [
-   'id' => [1,4,5],
-];
-
-$field = Field::integer('id', 'i')
-   ->setDescription('The order id for one or more orders to proces')
-   ->addRules(
-      new RequiredRule(),
-      new MinValueRule(1)
-   );
-
-$field->setValue($_GET['id']);
-$result = $field->validate();
-if ($result instanceof ValidationError) {
-   $message = $result->getMessage();
-   echo "Error: $message\n";
-}
-else {
-   foreach ($field->exportValue() as $id) {
-      echo "processing order #{$id}\n";
-      // ...
-   }
-}
-```

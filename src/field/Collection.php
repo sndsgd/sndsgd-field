@@ -4,14 +4,16 @@ namespace sndsgd\field;
 
 use \Exception;
 use \InvalidArgumentException;
-use \sndsgd\Field;
 use \sndsgd\Arr;
+use \sndsgd\Field;
+use \sndsgd\field\collection\DuplicateFieldNameException;
+use \sndsgd\field\collection\DuplicateFieldAliasException;
 
 
 /**
  * A base class for a collection of fields
  */
-class Collection
+class Collection implements \Countable
 {
    use \sndsgd\event\Target, \sndsgd\data\Manager;
 
@@ -40,9 +42,9 @@ class Collection
    /**
     * Any errors encountered during validation
     * 
-    * @var array.<sndsgd\field\ValidationError>|null
+    * @var array.<sndsgd\field\Error>|null
     */
-   protected $validationErrors = [];
+   protected $errors = [];
 
    /**
     * Create a new field collection
@@ -57,27 +59,30 @@ class Collection
    }
 
    /**
+    * @see http://php.net/manual/en/countable.count.php
+    * @return int
+    */
+   public function count()
+   {
+      return count($this->fields);
+   }
+
+   /**
     * Define a field
     * 
     * @param sndsgd\Field $field The field to define
     * @return sndsgd\field\Collection
     */
-   protected function addField(Field $field)
+   public function addField(Field $field)
    {
       $name = $field->getName();
-      if (array_key_exists($name, $this->fieldAliases)) {
-         throw new Exception(
-            "failed to define field; the name '$name' is already defined"
-         );
+      if (array_key_exists($name, $this->fields)) {
+         throw new DuplicateFieldNameException($name);
       }
       $this->fields[$name] = $field;
-      $this->fieldAliases[$name] = $name;
-
       foreach ($field->getAliases() as $alias) {
          if (array_key_exists($alias, $this->fieldAliases)) {
-            throw new Exception(
-               "failed to define field; the alias '$alias' is already in use"
-            );
+            throw new DuplicateFieldAliasException($alias);
          }
          $this->fieldAliases[$alias] = $name;
       }
@@ -86,24 +91,36 @@ class Collection
    }
 
    /**
-    * Define fields
+    * Define multiple fields
     *
-    * @param sndsgd\field\Field $field,... 
+    * @param array.<sndsgd\field\Field> $fields
     * @return sndsgd\field\Collection This instance
     */
-   public function addFields()
+   public function addFields(array $fields)
    {
-      foreach (func_get_args() as $field) {
-         # allow an array of fields to be passed
-         # its convenient to pass the result of function call this way
-         if (is_array($field)) {
-            call_user_func_array([$this, 'addFields'], $field);
-         }
-         else {
-            $this->addField($field);
-         }
+      foreach ($fields as $field) {
+         $this->addField($field);
       }
       return $this;
+   }
+
+   /**
+    * Remove a field from the collection
+    * 
+    * @param string $name A field name or alias
+    * @return boolean Whether or not a field was removed
+    */
+   public function removeField($name)
+   {
+      if (($field = $this->getField($name)) === null) {
+         return false;
+      }
+   
+      foreach ($field->getAliases() as $alias) {
+         unset($this->fieldAliases[$alias]);
+      }
+      unset($this->fields[$name]);
+      return true;
    }
 
    /**
@@ -116,11 +133,14 @@ class Collection
     */
    public function getField($name)
    {
-      if (!array_key_exists($name, $this->fieldAliases)) {
-         return null;
+      if (array_key_exists($name, $this->fields)) {
+         return $this->fields[$name];
       }
-      $index = $this->fieldAliases[$name];
-      return $this->fields[$index];
+      else if (array_key_exists($name, $this->fieldAliases)) {
+         $name = $this->fieldAliases[$name];
+         return $this->fields[$name];
+      }
+      return null;
    }
 
    /**
@@ -141,21 +161,21 @@ class Collection
    public function addValues(array $fieldValues)
    {
       foreach ($fieldValues as $fieldName => $values) {
-         $field = $this->getField($fieldName);
-         foreach (Arr::cast($values) as $index => $value) {
-            if ($field === null) {
-               $this->addValidationError(
-                  new ValidationError(
-                     'unknown parameter',
-                     $value,
-                     $fieldName,
-                     $index
-                  )
-               );
+         $values = Arr::cast($values);
+         if (null === ($field = $this->getField($fieldName))) {
+            $message = "unknown field";
+            $len = count($values);
+            if ($len !== 1) {
+               $message .= " (encountered $len values)";
             }
-            else {
+            $error = new Error($message);
+            $error->setName($fieldName);
+            $this->addError($error);
+         }
+         else {
+            foreach ($values as $index => $value) {
                $field->addValue($value);
-            }
+            }   
          }
       }
    }
@@ -170,7 +190,7 @@ class Collection
    public function validate()
    {
       # addValues adds validation errors for unknown values
-      $errs = count($this->validationErrors);
+      $errs = count($this->errors);
 
       $dataKey = constant(get_called_class().'::EVENT_DATA_KEY');
 
@@ -178,35 +198,36 @@ class Collection
          return false;
       }
       foreach ($this->fields as $field) {
-         $result = $field->validate($this);
-         if ($result instanceof ValidationError) {
-            $this->addValidationError($result);
-            $errs++;
+         if ($field->validate($this) === false) {
+            foreach ($field->getErrors() as $error) {
+               $this->addError($error);
+               $errs++;
+            }
          }
       }
       return (
          $errs > 0 ||
          $this->fire('afterValidate', [$dataKey => $this]) === false ||
-         count($this->validationErrors) > 0
+         count($this->errors) > 0
       ) ? false : true;
    }
 
    /**
     * Add a validation error
     * 
-    * @param sndsgd\field\ValidationError $error
-    * @param boolean $unshift Add the error to the beginning
+    * @param sndsgd\field\Error $error
+    * @param boolean $prepend Add the error to the beginning
     * @return integer The total number of validation errors
     */
-   public function addValidationError(ValidationError $error, $unshift = false)
+   public function addError(Error $error, $prepend = false)
    {
-      if ($unshift === true) {
-         array_unshift($this->validationErrors, $error);
+      if ($prepend === true) {
+         array_unshift($this->errors, $error);
       }
       else {
-         $this->validationErrors[] = $error;
+         $this->errors[] = $error;
       }
-      return count($this->validationErrors);
+      return count($this->errors);
    }
 
    /**
@@ -214,27 +235,27 @@ class Collection
     * 
     * @return boolean
     */
-   public function hasValidationErrors()
+   public function hasErrors()
    {
-      return (count($this->validationErrors) !== 0);
+      return (count($this->errors) !== 0);
    }
 
    /**
     * Get validation errors for one or all fields
     *
     * @param string|null $name The name of a field to get validation errors for
-    * @return array.<sndsgd\field\ValidationError>
+    * @return array.<sndsgd\field\Error>
     */
-   public function getValidationErrors($name = null)
+   public function getErrors($name = null)
    {
       if ($name === null) {
-         return $this->validationErrors;
+         return $this->errors;
       }
 
       $ret = [];
-      foreach ($this->validationErrors as $validationError) {
-         if ($validationError->getName() === $name) {
-            $ret[] = $validationError;
+      foreach ($this->errors as $error) {
+         if ($error->getName() === $name) {
+            $ret[] = $error;
          }
       }
       return $ret;
@@ -255,10 +276,7 @@ class Collection
          );
       }
       else if (($field = $this->getField($name)) == null) {
-         throw new UnknownFieldException(
-            "invalid value provided for 'name'; ".
-            "the field '{$name}' does not exist in the collection"
-         );
+         throw new UnknownFieldException($name);
       }
       return $field->exportValue();
    }

@@ -8,7 +8,7 @@ use \sndsgd\Arr;
 use \sndsgd\field\Collection;
 use \sndsgd\field\Rule;
 use \sndsgd\field\exeception\DuplicateRuleException;
-use \sndsgd\field\ValidationError;
+use \sndsgd\field\Error;
 
 
 /**
@@ -16,7 +16,7 @@ use \sndsgd\field\ValidationError;
  *
  * @todo Allow for setting an array of default values (Field::EXPORT_ARRAY)
  */
-abstract class Field
+abstract class Field implements \Countable
 {
    use \sndsgd\event\Target, \sndsgd\data\Manager;
 
@@ -24,38 +24,6 @@ abstract class Field
    const EXPORT_NORMAL = 0;
    const EXPORT_ARRAY = 1;
    const EXPORT_SKIP = 2;
-
-   /**
-    * Convenience method for creating fields by type
-    *
-    * @param string $type The type of field to create
-    * @param array $args The arguments provided to the static method
-    * @return sndsgd\Field
-    */
-   public static function __callStatic($type, array $args)
-   {
-      $classes = [
-         'bool' => 'sndsgd\\field\\Boolean',
-         'boolean' => 'sndsgd\\field\\Boolean',
-         'int' => 'sndsgd\\field\\Integer',
-         'integer' => 'sndsgd\\field\\Integer',
-         'flt' => 'sndsgd\\field\\Float',
-         'float' => 'sndsgd\\field\\Float',
-         'str' => 'sndsgd\\field\\String',
-         'string' => 'sndsgd\\field\\String',
-      ];
-
-      if (!array_key_exists($type, $classes)) {
-         throw new InvalidArgumentException("unknown field type '$type'");
-      }
-
-      $class = $classes[$type];
-      $field = new $class(array_shift($args));
-      if (count($args)) {
-         call_user_func_array([$field, 'addAliases'], $args);
-      }
-      return $field;
-   }
 
    /**
     * A human readable name for the field
@@ -103,11 +71,11 @@ abstract class Field
    protected $rules = [];
 
    /**
-    * A custom name to export the field as
-    *
-    * @var string|null
+    * Validation errors
+    * 
+    * @var array.<sndsgd\field\Errors>
     */
-   protected $exportName = null;
+   protected $errors = [];
 
    /**
     * A custom handler for exporting the field
@@ -123,25 +91,23 @@ abstract class Field
     */
    public function __construct($name)
    {
-      $this->setName($name);
-   }
-
-   /**
-    * Set the name of the field
-    *
-    * @param string $name
-    * @return sndsgd\Field
-    * @throws InvalidArgumentException
-    */
-   private function setName($name)
-   {
       if (!is_string($name)) {
          throw new InvalidArgumentException(
             "invalid value provided for 'name'; expecting a string"
          );
       }
       $this->name = $name;
-      return $this;
+   }
+
+   /**
+    * Get the number of values in the field
+    * 
+    * @see http://php.net/manual/en/countable.count.php
+    * @return int
+    */
+   public function count()
+   {
+      return ($this->value === null) ? 0 : count($this->value);
    }
 
    /**
@@ -332,16 +298,6 @@ abstract class Field
    }
 
    /**
-    * Get the number of values in the field (ignore the initial null)
-    *
-    * @return integer
-    */
-   public function getValueCount()
-   {
-      return (is_array($this->value)) ? count($this->value) : 0;
-   }
-
-   /**
     * Export the current value(s)
     *
     * note: when exporting from a collection (collection->getValues()), this
@@ -367,36 +323,39 @@ abstract class Field
    }
 
    /**
-    * Add one or more validation rules to the field
+    * Add a validation rule to the field
     *
-    * @param sndsgd\field\Rule,... $rule
+    * @param sndsgd\field\Rule $rule
     * @return sndsgd\Field The field instance
     */
-   public function addRules($rule)
+   public function addRule(Rule $rule)
    {
-      foreach (func_get_args() as $rule) {
-         if (!($rule instanceof Rule)) {
-            throw new InvalidArgumentException(
-               "invalid value provided for 'rule'; ".
-               "expecting one or more instances of sndsgd\\field\\Rule"
-            );
-         }
+      $classname = $rule->getClass();
+      if ($this->hasRule($classname) === true) {
+         throw new Exception(
+            "failed to add rule; the field {$this->name} already has an ".
+            "instance of '$classname'"
+         );
+      }
+      else if ($classname === Rule::REQUIRED) {
+         $this->rules = [$classname => $rule] + $this->rules;
+      }
+      else {
+         $this->rules[$classname] = $rule;
+      }
+      return $this;
+   }
 
-         $ruleClass = $rule->getClass();
-         if ($this->hasRule($ruleClass) === true) {
-            throw new Exception(
-               "failed to add rule; the field {$this->name} already has an ".
-               "instance of '$ruleClass'"
-            );
-         }
-
-         # the required rule should always be eval'd first
-         else if ($ruleClass === Rule::REQUIRED) {
-            $this->rules = [$ruleClass => $rule] + $this->rules;
-         }
-         else {
-            $this->rules[$ruleClass] = $rule;
-         }
+   /**
+    * Add validation rules to the field
+    *
+    * @param array.<sndsgd\field\Rule> $rules
+    * @return sndsgd\Field The field instance
+    */
+   public function addRules(array $rules)
+   {
+      foreach ($rules as $rule) {
+         $this->addRule($rule);
       }
       return $this;
    }
@@ -426,14 +385,14 @@ abstract class Field
     * Validate all the values in the field
     *
     * @param sndsgd\field\Collection|null $collection A field collection
-    * @return boolean|sndsgd\field\ValidationError
-    * @return boolean:true If all values are valid
-    * @return sndsgd\field\ValidationError If a value failed to validate
+    * @return boolean True if all values are 
     */
    public function validate(Collection $collection = null)
    {
+      $this->errors = [];
       $values = $this->getValuesAsArray();
       $len = count($values);
+      $lastValueIndex = $len - 1;
 
       for ($i=0; $i<$len; $i++) {
          $value = $values[$i];
@@ -444,18 +403,27 @@ abstract class Field
          }
 
          foreach ($this->rules as $name => $rule) {
-            $result = $rule->validate($value, $this->name, $i, $collection);
-            if ($result instanceof ValidationError) {
-               return $result;
+            $rule->setValue($value);
+            $rule->setField($this, $i);
+            $rule->setCollection($collection);
+            if ($rule->validate() === true) {
+               $fmtValue = $rule->getValue();
+               if ($fmtValue !== $value) {
+                  $this->setValue($fmtValue, $i);
+               }
             }
-            # if the validation method returned a new value, update it
-            else if ($result !== $value) {
-               $value = $result;
-               $this->setValue($result, $i);
+            else {
+               $this->errors[] = $rule->getError();
+               break;
             }
          }
       }
-      return true;
+      return count($this->errors) === 0;
+   }
+
+   public function getErrors()
+   {
+      return $this->errors;
    }
 }
 

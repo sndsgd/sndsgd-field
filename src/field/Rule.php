@@ -3,6 +3,7 @@
 namespace sndsgd\field;
 
 use \InvalidArgumentException;
+use \sndsgd\Field;
 
 
 /**
@@ -10,7 +11,14 @@ use \InvalidArgumentException;
  */
 abstract class Rule
 {
-   const REQUIRED = 'sndsgd\\field\\rule\\Required';
+   /**
+    * The classname of the rule that validates a required value
+    *
+    * This is used by sndsgd\Field::validate to determine whether or not
+    * an empty value should be validated
+    * @var string
+    */
+   const REQUIRED = 'sndsgd\\field\\rule\\RequiredRule';
 
    /**
     * The error message when validation fails
@@ -18,6 +26,34 @@ abstract class Rule
     * @var string
     */
    protected $message = 'invalid value';
+
+   /**
+    * The value to validate
+    * 
+    * @var mixed
+    */
+   protected $value;
+
+   /**
+    * If the value is part of a field, its index within the field
+    * 
+    * @var integer
+    */
+   protected $valueIndex;
+
+   /**
+    * The value's parent field instance
+    * 
+    * @var sndsgd\Field|null
+    */
+   protected $field;
+
+   /**
+    * The parent collection of the value's parent field
+    * 
+    * @var sndsgd\field\Collection|null
+    */
+   protected $collection;
 
    /**
     * @param null $value A value for use in the validation method
@@ -29,6 +65,27 @@ abstract class Rule
             "invalid value provided for 'value'; expecting no arguments"
          );
       }
+   }
+
+   /**
+    * Validate a value
+    * 
+    * @param string|integer|float|boolean $value
+    * @return boolean
+    * @return boolean:true Validation was successfull
+    * @return boolean:false Validation failed
+    */
+   abstract public function validate();
+
+   /**
+    * Get the rule classname
+    *
+    * Used by sndsgd\Field to determine if the rule already exists
+    * @return string
+    */
+   public function getClass()
+   {
+      return get_called_class();
    }
 
    /**
@@ -50,31 +107,73 @@ abstract class Rule
    }
 
    /**
-    * Get the rule classname
-    *
+    * Get the error message
+    * 
     * @return string
     */
-   public function getClass()
+   protected function getMessage()
    {
-      return get_called_class();
+      return $this->message;
    }
 
    /**
-    * Validate a value
+    * Set the value to validate
     * 
-    * @param string|integer|float|boolean $value
-    * @param string|null $name The name of the field that is being validated
-    * @param integer $index
-    * @param sndsgd\field\Collection $collection The field's parent collection
-    * @return mixed
-    * @return string|integer|float|boolean|object If the value is valid
-    * @return sndsgd\field\ValidationError If the value is NOT valid
+    * @param mixed $value
     */
-   abstract public function validate(
-      $value,
-      $name = null,
-      $index = null,
-      Collection $collection = null
-   );
+   public function setValue($value)
+   {
+      $this->value = $value;
+   }
+
+   /**
+    * Get the value
+    * 
+    * @return mixed
+    */
+   public function getValue()
+   {
+      return $this->value;
+   }
+
+   /**
+    * Set the value's parent field for use in validation
+    * 
+    * @param sndsgd\Field $field
+    * @param integer $index The index of the value in the field
+    */
+   public function setField(Field $field, $index = 0)
+   {
+      $this->field = $field;
+      $this->valueIndex = $index;
+   }
+
+   /**
+    * Set a field collection for use in validation
+    * 
+    * @param sndsgd\field\Collection $collection
+    */
+   public function setCollection(Collection $collection)
+   {
+      $this->collection = $collection;
+   }
+
+   /**
+    * Get an error instance
+    * 
+    * @return sndsgd\field\Error
+    */
+   public function getError()
+   {
+      $error = new Error($this->getMessage());
+      $error->setValue($this->value);
+      if ($this->field !== null) {
+         $error->setName($this->field->getName());
+      }
+      if ($this->valueIndex !== null) {
+         $error->setIndex($this->valueIndex);
+      }
+      return $error;
+   }
 }
 

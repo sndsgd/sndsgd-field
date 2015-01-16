@@ -3,11 +3,14 @@
 namespace sndsgd;
 
 use \sndsgd\Event;
-use \sndsgd\field\String as StringField;
+use \sndsgd\field\BooleanField;
+use \sndsgd\field\IntegerField;
+use \sndsgd\field\FloatField;
+use \sndsgd\field\StringField;
 use \sndsgd\field\Collection;
-use \sndsgd\field\rule\Required as RequiredRule;
-use \sndsgd\field\rule\MinValue as MinValueRule;
-use \sndsgd\field\rule\MaxValue as MaxValueRule;
+use \sndsgd\field\rule\RequiredRule;
+use \sndsgd\field\rule\MinValueRule;
+use \sndsgd\field\rule\MaxValueRule;
 
 
 /**
@@ -20,52 +23,16 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     */
    public function setUp()
    {
-      $this->field = Field::str('test');
+      $this->field = new StringField('test');
    }
 
    /**
-    * @covers ::__callStatic
-    */
-   public function testCallStatic()
-   {
-      $field = Field::bool('name');
-      $this->assertInstanceOf('sndsgd\\field\\Boolean', $field);
-      $field = Field::boolean('name', 'n');
-      $this->assertInstanceOf('sndsgd\\field\\Boolean', $field);
-      $this->assertEquals(['n'], $field->getAliases());
-
-      $field = Field::int('name');
-      $this->assertInstanceOf('sndsgd\\field\\Integer', $field);
-      $field = Field::integer('name');
-      $this->assertInstanceOf('sndsgd\\field\\Integer', $field);
-
-      $field = Field::flt('name');
-      $this->assertInstanceOf('sndsgd\\field\\Float', $field);
-      $field = Field::float('name');
-      $this->assertInstanceOf('sndsgd\\field\\Float', $field);
-
-      $field = Field::str('name');
-      $this->assertInstanceOf('sndsgd\\field\\String', $field);
-      $field = Field::string('name');
-      $this->assertInstanceOf('sndsgd\\field\\String', $field);
-   }
-
-   /**
-    * @covers ::__callStatic
+    * @covers ::__construct
     * @expectedException InvalidArgumentException
     */
-   public function testCallStaticTypeException()
+   public function testSetNameException()
    {
-      Field::blegh('jimbo');
-   }
-
-   /**
-    * @covers ::__callStatic
-    * @expectedException InvalidArgumentException
-    */
-   public function testCallStaticNameException()
-   {
-      Field::int([]);
+      new StringField(42);
    }
 
    public function testFieldEvents()
@@ -85,21 +52,12 @@ class FieldTest extends \PHPUnit_Framework_TestCase
    }
 
    /**
-    * @covers ::setName
-    * @expectedException InvalidArgumentException
-    */
-   public function testSetNameException()
-   {
-      new StringField(42);
-   }
-
-   /**
     * @covers ::getName
     */
    public function testGetName()
    {
       $name = 'test';
-      $field = Field::string($name);
+      $field = new StringField($name);
       $this->assertEquals($name, $field->getName());
    }
 
@@ -198,6 +156,11 @@ class FieldTest extends \PHPUnit_Framework_TestCase
       $val = 'default-value';
       $this->field->setDefault($val);
       $this->assertEquals($val, $this->field->getValue());
+      $this->field->addValue(1);
+      $this->field->addValue(2);
+      $this->assertEquals(1, $this->field->getValue(0));
+      $this->assertEquals(2, $this->field->getValue(1));
+      $this->assertEquals(null, $this->field->getValue(2));
    }
 
    /**
@@ -218,24 +181,13 @@ class FieldTest extends \PHPUnit_Framework_TestCase
    }
 
    /**
-    * @covers ::addRules
-    * @expectedException InvalidArgumentException
-    */
-   public function testAddRulesNotRuleException()
-   {
-      $this->field->addRules(42);
-   }
-
-   /**
-    * @covers ::addRules
+    * @covers ::addRule
     * @expectedException Exception
     */
    public function testAddRulesDupeRuleException()
    {
-      $this->field->addRules(
-         new RequiredRule,
-         new RequiredRule
-      );
+      $this->field->addRule(new RequiredRule);
+      $this->field->addRule(new RequiredRule);
    }
 
    /**
@@ -244,10 +196,10 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     */
    public function testValidateNotRequired()
    {
-      $this->field->addRules(
+      $this->field->addRules([
          new MinValueRule(1),
          new MaxValueRule(10)
-      );
+      ]);
 
       // no value, but not required (valid)
       $this->assertTrue($this->field->validate());
@@ -265,16 +217,16 @@ class FieldTest extends \PHPUnit_Framework_TestCase
       $rules = $field->getRules();
       $this->assertCount(0, $rules);
 
-      $field->addRules(new MinValueRule(1));
+      $field->addRule(new MinValueRule(1));
       $rules = $field->getRules();
       $this->assertCount(1, $rules);
 
-      $field->addRules(new RequiredRule);
+      $field->addRule(new RequiredRule);
       $rules = $field->getRules();
       $this->assertCount(2, $rules);
 
-      $this->assertInstanceOf('sndsgd\\field\\rule\\Required', array_shift($rules));
-      $this->assertInstanceOf('sndsgd\\field\\rule\\MinValue', array_shift($rules));
+      $this->assertInstanceOf('sndsgd\\field\\rule\\RequiredRule', array_shift($rules));
+      $this->assertInstanceOf('sndsgd\\field\\rule\\MinValueRule', array_shift($rules));
    }
 }
 
