@@ -51,9 +51,9 @@ class Collection implements \Countable
     * 
     * @param array.<sndsgd\Field>|null $fields Fields to add to the collection
     */
-   public function __construct(array $fields = null)
+   public function __construct(array $fields = [])
    {
-      if ($fields !== null) {
+      if ($fields) {
          $this->addFields($fields);
       }
    }
