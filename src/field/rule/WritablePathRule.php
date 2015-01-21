@@ -26,13 +26,6 @@ class WritablePathRule extends \sndsgd\field\Rule
    protected $isDir = false;
 
    /**
-    * If the path test fails, the resulting error message is stashed here
-    * 
-    * @var string
-    */
-   protected $testResult;
-
-   /**
     * @param boolean $isDir
     */
    public function __construct($isDir = false)
@@ -49,16 +42,6 @@ class WritablePathRule extends \sndsgd\field\Rule
    /**
     * {@inheritdoc}
     */
-   public function getMessage()
-   {
-      return ($this->message === 'invalid value')
-         ? $this->testResult
-         : $this->message;
-   }
-
-   /**
-    * {@inheritdoc}
-    */
    public function validate()
    {
       $path = Path::normalize($this->value);
@@ -69,7 +52,7 @@ class WritablePathRule extends \sndsgd\field\Rule
          $this->value = $path;
          return true;
       }
-      $this->testResult = $test;
+      $this->message = $test;
       return false;
    }
 }
