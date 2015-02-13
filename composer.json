@@ -1,6 +1,6 @@
 {
    "name": "sndsgd/field",
-   "description": "A collection of tools for handling user input",
+   "description": "Tools for handling user input with PHP",
    "type": "library",
    "homepage": "https://github.com/sndsgd/sndsgd-field",
    "license": "MIT",
