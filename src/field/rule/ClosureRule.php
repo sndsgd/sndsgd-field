@@ -2,6 +2,7 @@
 
 namespace sndsgd\field\rule;
 
+use \Closure;
 use \Exception;
 use \InvalidArgumentException;
 use \sndsgd\Field;
@@ -17,7 +18,7 @@ class ClosureRule extends \sndsgd\field\Rule
    /**
     * {@inheritdoc}
     */
-   protected $message = '';
+   protected $message = "";
 
    /**
     * The handler function
@@ -37,6 +38,9 @@ class ClosureRule extends \sndsgd\field\Rule
             "expecting a closure"
          );
       }
+      if (!is_string($handler)) {
+         $handler = $handler->bindTo($this, $this);
+      }
       $this->fn = $handler;
    }
 
@@ -50,9 +54,8 @@ class ClosureRule extends \sndsgd\field\Rule
       if (is_string($this->fn)) {
          return $this->fn;
       }
-
-      $rand = mt_rand().' '.microtime(true);
-      return 'sndsgd\field\rule\Closure('.sha1($rand).')';
+      $hash = sha1(mt_rand().microtime(true));
+      return "sndsgd\\field\\rule\\Closure($hash)";
    }
 
    /**

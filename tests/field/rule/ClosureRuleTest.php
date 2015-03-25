@@ -78,19 +78,39 @@ class ClosureRuleTest extends \PHPUnit_Framework_TestCase
       $field = (new StringField('test'))
          ->addRules([
             $this->rule,
-            new ClosureRule(function($v, $d, $n, $i, $c) {
+            new ClosureRule(function($v, $i, $f, $c) {
                return $v;
             }),
-            new ClosureRule(function($v, $d, $n, $i, $c) {
+            new ClosureRule(function($v, $i, $f, $c) {
                return $v;
             }),
-            new ClosureRule(function($v, $d, $n, $i, $c) {
+            new ClosureRule(function($v, $i, $f, $c) {
                return $v;
             }),
-            new ClosureRule(function($v, $d, $n, $i, $c) {
+            new ClosureRule(function($v, $i, $f, $c) {
                return $v;
             })
          ]);
+   }
+
+   public function testClosureScope()
+   {
+      // validation always succeeds
+      // the value should be updated to the classname as string
+      $rule = new ClosureRule(function($v, $i=null, $f=null, $c=null) {
+         return [true, get_class($this)];
+      });
+      $rule->validate();
+      $this->assertEquals(get_class($rule), $rule->getValue());
+
+      // validation always fails
+      // set the rule's message within the closure
+      $rule = new ClosureRule(function($v, $i=null, $f=null, $c=null) {
+         $this->setMessage("fail");
+         return false;
+      });
+      $rule->validate();
+      $this->assertEquals("fail", $rule->getError()->getMessage());
    }
 }
 
