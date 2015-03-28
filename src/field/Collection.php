@@ -288,6 +288,20 @@ class Collection implements \Countable
    }
 
    /**
+    * Export validation errors for all fields
+    *
+    * @return array<string,mixed>
+    */
+   public function exportErrors()
+   {
+      $ret = [];
+      foreach ($this->errors as $error) {
+         $ret[] = $error->export();
+      }
+      return $ret;
+   }
+
+   /**
     * Convenience method to get a particular field value
     * 
     * @return mixed

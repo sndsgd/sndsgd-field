@@ -121,5 +121,20 @@ class Error
    {
       return $this->value;
    }
+
+   /**
+    * Export the error as an array
+    * 
+    * @return array<string,mixed>
+    */
+   public function export()
+   {
+      return [
+         "name" => $this->name,
+         "index" => $this->index,
+         "message" => $this->message,
+         "value" => $this->value
+      ];
+   }
 }
 

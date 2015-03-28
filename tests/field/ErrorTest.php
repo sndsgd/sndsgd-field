@@ -60,5 +60,19 @@ class ErrorTest extends \PHPUnit_Framework_TestCase
       $this->error->setValue($value);
       $this->assertEquals($expect, $this->error->getValue());
    }
+
+   public function testExport()
+   {
+      $this->error->setName("test");
+      $this->error->setValue(42);
+      $this->error->setIndex(0);
+      $expect = [
+         "name" => "test",
+         "index" => 0,
+         "message" => "validation failed",
+         "value" => 42
+      ];
+      $this->assertEquals($expect, $this->error->export());
+   }
 }
 

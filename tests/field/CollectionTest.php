@@ -150,10 +150,8 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
       $this->assertFalse($coll->validate());
    }
 
-   public function testErrors()
+   private function createTestErrors()
    {
-      $this->assertFalse($this->coll->hasErrors());
-
       $titleField = new StringField('title');
       $cameraField = new StringField('camera');
 
@@ -165,13 +163,29 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
       # create another error, and prepend it to the array of errors
       $e2 = new Error('enter a camera');
-      $e1->setName($cameraField->getName());
+      $e2->setName($cameraField->getName());
       $this->assertEquals(2, $this->coll->addError($e2, true));
       $this->assertTrue($this->coll->hasErrors());
-      
+
+      return [$e2, $e1];
+   }
+
+   public function testErrors()
+   {
+      $this->assertFalse($this->coll->hasErrors());
+      $testErrors = $this->createTestErrors();
       $errors = $this->coll->getErrors();
-      $this->assertEquals($e1, $errors[1]);
-      $this->assertEquals($e2, $errors[0]);
+      $this->assertEquals($testErrors[0], $errors[0]);
+      $this->assertEquals($testErrors[1], $errors[1]);
+   }
+
+   public function testExportErrors()
+   {
+      $this->assertFalse($this->coll->hasErrors());
+      $testErrors = $this->createTestErrors();
+      $errors = $this->coll->exportErrors();
+      $this->assertEquals($testErrors[0]->export(), $errors[0]);
+      $this->assertEquals($testErrors[1]->export(), $errors[1]);
    }
 
    public function testAddValues()
