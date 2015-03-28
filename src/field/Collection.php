@@ -200,7 +200,7 @@ class Collection implements \Countable
          }
          else {
             foreach ($values as $index => $value) {
-               $field->addValue($value);
+               $field->addValue($value, $index);
             }   
          }
       }

@@ -72,7 +72,7 @@ abstract class Field implements \Countable
 
    /**
     * Validation errors
-    * 
+    *
     * @var array.<sndsgd\field\Errors>
     */
    protected $errors = [];
@@ -101,7 +101,7 @@ abstract class Field implements \Countable
 
    /**
     * Get the number of values in the field
-    * 
+    *
     * @see http://php.net/manual/en/countable.count.php
     * @return int
     */
@@ -229,14 +229,22 @@ abstract class Field implements \Countable
     * Add a value
     *
     * @param string|number $value The value to add
+    * @param string|integer|null $index The value key in the values array
     * @return sndsgd\Field
     */
-   public function addValue($value)
+   public function addValue($value, $index = null)
    {
       if ($this->value === null) {
          $this->value = [];
       }
-      $this->value[] = $value;
+
+      if ($index === null) {
+         $this->value[] = $value;
+      }
+      else {
+         $this->value[$index] = $value;
+      }
+
       return $this;
    }
 
@@ -294,7 +302,12 @@ abstract class Field implements \Countable
     */
    private function getValuesAsArray()
    {
-      return ($this->value !== null) ? $this->value : [ $this->defaultValue ];
+      if ($this->value === null) {
+         return is_array($this->defaultValue) 
+            ? $this->defaultValue 
+            : [ $this->defaultValue ];
+      }
+      return $this->value;
    }
 
    /**
@@ -385,18 +398,12 @@ abstract class Field implements \Countable
     * Validate all the values in the field
     *
     * @param sndsgd\field\Collection|null $collection A field collection
-    * @return boolean True if all values are 
+    * @return boolean True if all values are
     */
    public function validate(Collection $collection = null)
    {
       $this->errors = [];
-      $values = $this->getValuesAsArray();
-      $len = count($values);
-      $lastValueIndex = $len - 1;
-
-      for ($i=0; $i<$len; $i++) {
-         $value = $values[$i];
-
+      foreach ($this->getValuesAsArray() as $index => $value) {
          # skip fields with a null value if they are not required
          if ($value === null && $this->hasRule(Rule::REQUIRED) === false) {
             continue;
@@ -404,12 +411,12 @@ abstract class Field implements \Countable
 
          foreach ($this->rules as $name => $rule) {
             $rule->setValue($value);
-            $rule->setField($this, $i);
+            $rule->setField($this, $index);
             $rule->setCollection($collection);
             if ($rule->validate() === true) {
                $fmtValue = $rule->getValue();
                if ($fmtValue !== $value) {
-                  $this->setValue($fmtValue, $i);
+                  $this->setValue($fmtValue, $index);
                }
             }
             else {

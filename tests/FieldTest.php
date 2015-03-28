@@ -137,6 +137,19 @@ class FieldTest extends \PHPUnit_Framework_TestCase
       $this->assertEquals([43,11], $this->field->exportValue());
    }
 
+   public function testAddValueWithStringIndexes()
+   {
+      $values = [
+         "first" => "one",
+         "second" => "two",
+         "third" => "three"
+      ];
+      foreach ($values as $index => $value) {
+         $this->field->addValue($value, $index);
+      }
+      $this->assertEquals($values, $this->field->exportValue());
+   }
+
    /**
     * @covers ::hasValue
     */
