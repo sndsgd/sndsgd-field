@@ -431,6 +431,9 @@ abstract class Field implements \Countable
       return count($this->errors) === 0;
    }
 
+   /**
+    * @return array<sndsgd\field\Error>
+    */
    public function getErrors()
    {
       return $this->errors;
