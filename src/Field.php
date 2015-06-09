@@ -319,19 +319,21 @@ abstract class Field implements \Countable
     */
    public function exportValue()
    {
-      $values = $this->getValuesAsArray();
-
       if (
          $this->exportHandler === self::EXPORT_NORMAL ||
          $this->exportHandler === self::EXPORT_SKIP
       ) {
+         $values = $this->getValuesAsArray();
          return (count($values) === 1) ? $values[0] : $values;
       }
       else if ($this->exportHandler === self::EXPORT_ARRAY) {
-         return $values;
+         if ($this->value === null) {
+            return ($this->defaultValue === null) ? [] : $this->defaultValue;
+         }
+         return Arr::cast($this->value);
       }
       else {
-         return call_user_func($this->exportHandler, $values);
+         return call_user_func($this->exportHandler, $this->getValuesAsArray());
       }
    }
 

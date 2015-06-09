@@ -100,8 +100,9 @@ class FieldTest extends \PHPUnit_Framework_TestCase
     */
    public function testSetExportArray()
    {
-      $this->field->addValue(42);
       $this->field->setExportHandler(Field::EXPORT_ARRAY);
+      $this->assertEquals([], $this->field->exportValue());
+      $this->field->addValue(42);
       $this->assertEquals([42], $this->field->exportValue());
       $this->field->addValue(84);
       $this->assertEquals([42, 84], $this->field->exportValue());
