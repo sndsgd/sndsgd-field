@@ -416,6 +416,7 @@ abstract class Field implements \Countable
             if ($rule->validate() === true) {
                $fmtValue = $rule->getValue();
                if ($fmtValue !== $value) {
+                  $value = $fmtValue;
                   $this->setValue($fmtValue, $index);
                }
             }
