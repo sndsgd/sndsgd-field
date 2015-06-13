@@ -62,6 +62,22 @@ class FieldTest extends \PHPUnit_Framework_TestCase
    }
 
    /**
+    * @covers ::setVisibility
+    * @covers ::getVisibility
+    */
+   public function testSetGetVisibility()
+   {
+      $field = new StringField("test");
+      $value = Field::VISIBILITY_PRIVATE;
+      $field->setVisibility($value);
+      $this->assertEquals($value, $field->getVisibility());
+
+      $value = Field::VISIBILITY_PUBLIC;
+      $field->setVisibility($value);
+      $this->assertEquals($value, $field->getVisibility());
+   }
+
+   /**
     * @covers ::setDescription
     * @covers ::getDescription
     */

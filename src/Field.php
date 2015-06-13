@@ -25,6 +25,10 @@ abstract class Field implements \Countable
    const EXPORT_ARRAY = 1;
    const EXPORT_SKIP = 2;
 
+   // visibility options
+   const VISIBILITY_PRIVATE = 0;
+   const VISIBILITY_PUBLIC = 1;
+
    /**
     * A human readable name for the field
     *
@@ -39,6 +43,13 @@ abstract class Field implements \Countable
     * @var array.<string,boolean>
     */
    protected $aliases = [];
+
+   /**
+    * The visibility definition for the field
+    *
+    * @var integer
+    */
+   protected $visibility = 1;
 
    /**
     * A description of the field
@@ -142,6 +153,22 @@ abstract class Field implements \Countable
    public function getAliases()
    {
       return array_keys($this->aliases);
+   }
+
+   /**
+    * @param integer $something
+    */
+   public function setVisibility($visibility)
+   {
+      $this->visibility = $visibility;
+   }
+   
+   /**
+    * @return integer
+    */
+   public function getVisibility()
+   {
+      return $this->visibility;
    }
 
    /**
