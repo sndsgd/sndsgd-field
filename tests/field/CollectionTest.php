@@ -116,6 +116,18 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
       $this->assertCount(5, $this->coll->getFields());
    }
 
+   public function testGetFieldsVisibility()
+   {
+      $title = $this->coll->getField("title");
+      $title->setVisibility(Field::VISIBILITY_PRIVATE);
+
+      $this->assertCount(4, $this->coll->getFields());
+      $this->assertCount(1, $this->coll->getFields(Field::VISIBILITY_PRIVATE));
+
+      $both = Field::VISIBILITY_PRIVATE | Field::VISIBILITY_PUBLIC;
+      $this->assertCount(5, $this->coll->getFields($both));
+   }
+
    public function testSetGetData()
    {
       $this->coll->addData('one', 1);

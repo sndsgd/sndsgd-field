@@ -26,8 +26,8 @@ abstract class Field implements \Countable
    const EXPORT_SKIP = 2;
 
    // visibility options
-   const VISIBILITY_PRIVATE = 0;
-   const VISIBILITY_PUBLIC = 1;
+   const VISIBILITY_PRIVATE = 1;
+   const VISIBILITY_PUBLIC = 2;
 
    /**
     * A human readable name for the field
@@ -49,7 +49,7 @@ abstract class Field implements \Countable
     *
     * @var integer
     */
-   protected $visibility = 1;
+   protected $visibility = 2;
 
    /**
     * A description of the field
@@ -161,6 +161,7 @@ abstract class Field implements \Countable
    public function setVisibility($visibility)
    {
       $this->visibility = $visibility;
+      return $this;
    }
    
    /**

@@ -171,12 +171,19 @@ class Collection implements \Countable
 
    /**
     * Get an associative array of the fields in this collection
-    * 
+    *
+    * @param integer $visibility A bitmask to filter fields by visibility
     * @return array.<string,sndsgd\Field>
     */
-   public function getFields()
+   public function getFields($visibility = Field::VISIBILITY_PUBLIC)
    {
-      return $this->fields;
+      $ret = [];
+      foreach ($this->fields as $name => $field) {
+         if ($field->getVisibility() & $visibility) {
+            $ret[$name] = $field;
+         }
+      }
+      return $ret;
    }
 
    /**
