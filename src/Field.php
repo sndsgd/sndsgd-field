@@ -228,10 +228,10 @@ abstract class Field implements \Countable
    public function setExportHandler($type)
    {
       if (
-         is_callable($type) ||
          $type === self::EXPORT_NORMAL ||
          $type === self::EXPORT_ARRAY ||
-         $type === self::EXPORT_SKIP
+         $type === self::EXPORT_SKIP ||
+         is_callable($type)
       ) {
          $this->exportHandler = $type;
          return $this;
