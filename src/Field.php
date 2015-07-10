@@ -343,25 +343,30 @@ abstract class Field implements \Countable
     *
     * note: when exporting from a collection (collection->getValues()), this
     * method is not called if `$this->exportHandler === Field::EXPORT_SKIP`
+    * @param ?integer $exportHandler A handler to override the 
     * @return array.<number|string>|number|string
     */
-   public function exportValue()
+   public function exportValue($exportHandler = null)
    {
+      if ($exportHandler === null) {
+         $exportHandler = $this->exportHandler;
+      }
+
       if (
-         $this->exportHandler === self::EXPORT_NORMAL ||
-         $this->exportHandler === self::EXPORT_SKIP
+         $exportHandler === self::EXPORT_NORMAL ||
+         $exportHandler === self::EXPORT_SKIP
       ) {
          $values = $this->getValuesAsArray();
          return (count($values) === 1) ? $values[0] : $values;
       }
-      else if ($this->exportHandler === self::EXPORT_ARRAY) {
+      else if ($exportHandler === self::EXPORT_ARRAY) {
          if ($this->value === null) {
             return ($this->defaultValue === null) ? [] : $this->defaultValue;
          }
          return Arr::cast($this->value);
       }
       else {
-         return call_user_func($this->exportHandler, $this->getValuesAsArray());
+         return call_user_func($exportHandler, $this->getValuesAsArray());
       }
    }
 

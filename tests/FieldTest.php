@@ -154,6 +154,21 @@ class FieldTest extends \PHPUnit_Framework_TestCase
       $this->assertEquals([43,11], $this->field->exportValue());
    }
 
+   /**
+    * @covers ::exportValue
+    */
+   public function testExportValueOverride()
+   {
+      $this->assertNull($this->field->exportValue());
+      $result = $this->field->exportValue(Field::EXPORT_ARRAY);
+      $this->assertTrue(is_array($result));
+      $this->assertCount(0, $result);
+
+      $this->field->addValue(42);
+      $result = $this->field->exportValue(Field::EXPORT_ARRAY);
+      $this->assertEquals([42], $result);
+   }
+
    public function testAddValueWithStringIndexes()
    {
       $values = [

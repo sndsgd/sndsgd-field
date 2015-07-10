@@ -245,6 +245,16 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
       );
    }
 
+   public function testExportFieldValueOverrideHandler()
+   {
+      $this->coll->addValues(["title" => "test 42"]);
+      $result = $this->coll->exportFieldValue('title');
+      $this->assertEquals("test 42", $result);
+
+      $result = $this->coll->exportFieldValue('title', Field::EXPORT_ARRAY);
+      $this->assertEquals(["test 42"], $result);
+   }
+
    /**
     * @expectedException InvalidArgumentException
     */

@@ -310,11 +310,13 @@ class Collection implements \Countable
 
    /**
     * Convenience method to get a particular field value
-    * 
+    *
+    * @param string $name The field name
+    * @param ?integer $exportHandler AN export handler
     * @return mixed
     * @throws InvalidArgumentException If provided name does not exist
     */
-   public function exportFieldValue($name)
+   public function exportFieldValue($name, $exportHandler = null)
    {
       if (!is_string($name)) {
          throw new InvalidArgumentException(
@@ -325,7 +327,7 @@ class Collection implements \Countable
       else if (($field = $this->getField($name)) == null) {
          throw new UnknownFieldException($name);
       }
-      return $field->exportValue();
+      return $field->exportValue($exportHandler);
    }
 
    /**
