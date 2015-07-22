@@ -98,6 +98,18 @@ class FieldTest extends \PHPUnit_Framework_TestCase
    }
 
    /**
+    * @covers ::setDefault
+    * @covers ::getDefault
+    */
+   public function testSetGetDefault()
+   {
+      $value = 42;
+      $field = new Field("test");
+      $field->setDefault($value);
+      $this->assertEquals($value, $field->getDefault());
+   }
+
+   /**
     * @covers ::setExportHandler
     * @covers ::exportValue
     */

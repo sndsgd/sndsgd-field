@@ -16,7 +16,7 @@ use \sndsgd\field\Error;
  *
  * @todo Allow for setting an array of default values (Field::EXPORT_ARRAY)
  */
-abstract class Field implements \Countable
+class Field implements \Countable
 {
    use \sndsgd\event\Target, \sndsgd\data\Manager;
 
@@ -40,7 +40,7 @@ abstract class Field implements \Countable
     * One or more aliases for the field name
     *
     * Note: used for short names in cli scripts
-    * @var array.<string,boolean>
+    * @var array<string,boolean>
     */
    protected $aliases = [];
 
@@ -70,21 +70,21 @@ abstract class Field implements \Countable
     * The value(s) are stored in an indexed array
     *
     * When the field has a value, this will always be an array of values
-    * @var array.<string|integer|float|boolean>|null
+    * @var array<string|integer|float|boolean>|null
     */
    protected $value = null;
 
    /**
     * Validation rules
     *
-    * @var array.<string,sndsgd\field\Rule>
+    * @var array<string,sndsgd\field\Rule>
     */
    protected $rules = [];
 
    /**
     * Validation errors
     *
-    * @var array.<sndsgd\field\Errors>
+    * @var array<sndsgd\field\Errors>
     */
    protected $errors = [];
 
@@ -148,7 +148,7 @@ abstract class Field implements \Countable
    /**
     * Get all the aliases for the field
     *
-    * @return array.<string>
+    * @return array<string>
     */
    public function getAliases()
    {
@@ -206,7 +206,10 @@ abstract class Field implements \Countable
     * @return sndsgd\Field
     * @throws InvalidArgumentException If $value is not the appropriate type
     */
-   abstract public function setDefault($value);
+   public function setDefault($value)
+   {
+      $this->defaultValue = $value;
+   }
 
    /**
     * Get a default value
@@ -279,7 +282,7 @@ abstract class Field implements \Countable
    /**
     * Set one or all values
     *
-    * @param string|integer|float|array.<string|integer|float> $value
+    * @param string|integer|float|array<string|integer|float> $value
     * @param integer|null $index
     * @return sndsgd\Field
     */
@@ -326,7 +329,7 @@ abstract class Field implements \Countable
     * Get all of the current values as an array of values
     *
     * If no value is currently set, the default value will be returned
-    * @return array.<string|integer|float|boolean|null>
+    * @return array<string|integer|float|boolean|null>
     */
    private function getValuesAsArray()
    {
@@ -344,7 +347,7 @@ abstract class Field implements \Countable
     * note: when exporting from a collection (collection->getValues()), this
     * method is not called if `$this->exportHandler === Field::EXPORT_SKIP`
     * @param ?integer $exportHandler A handler to override the 
-    * @return array.<number|string>|number|string
+    * @return array<number|string>|number|string
     */
    public function exportValue($exportHandler = null)
    {
@@ -397,7 +400,7 @@ abstract class Field implements \Countable
    /**
     * Add validation rules to the field
     *
-    * @param array.<sndsgd\field\Rule> $rules
+    * @param array<sndsgd\field\Rule> $rules
     * @return sndsgd\Field The field instance
     */
    public function addRules(array $rules)
@@ -422,7 +425,7 @@ abstract class Field implements \Countable
    /**
     * Get all the rules
     *
-    * @return array.<string,sndsgd\field\Rule|callable>
+    * @return array<string,sndsgd\field\Rule|callable>
     */
    public function getRules()
    {
