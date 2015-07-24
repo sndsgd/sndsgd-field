@@ -209,6 +209,7 @@ class Field implements \Countable
    public function setDefault($value)
    {
       $this->defaultValue = $value;
+      return $this;
    }
 
    /**
