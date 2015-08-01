@@ -56,36 +56,24 @@ var_dump($rule->validate());
 
 
 
-## Using closures
+## Closure Rules
 
-If you encounter the need to create a custom rule and don't see the need to subclass `sndsgd\field\Rule`, you can use `sndsgd\field\rule\Closure`.
+If you encounter the need to create a custom rule and don't see the need to subclass `sndsgd\field\Rule`, you can use `sndsgd\field\rule\Closure`. The handler function will be bound to the associated field immediately before `validate()` is called.
 
-*Example: create a validation rule that verifies a value is greater than previous values in the same field.*
+*Example: create a rule that verifies a value is greater than the value before it in the same field.*
 
 ```php
 /**
- * Signature for a closure rule handler
- * @param mixed $value The value to validate
- * @param integer|null $index The index of the value in it's parent field
- * @param sndsgd\Field|null $field The value's parent field
- * @param sndsgd\field\Collection|null $coll The value's parent collection
- * @return mixed
+ * @this \sndsgd\Field
  * @return boolean Whether or not the value was valid
- * @return array
- *  [0] boolean Whether or not the value was valid
- *  [1] mixed A formatted value to replace the original value
  */
-$handler = function(
-   $value, 
-   $index = null, 
-   \sndsgd\Field $field = null, 
-   \sndsgd\field\Collection $coll = null
-) {
+$handler = function() {
    if (
-      $index > 0 && 
-      ($previousValue = $field->getValue($index - 1)) && 
-      $value <= $previousValue
+      $this->index > 0 && 
+      ($previousValue = $this->field->getValue($this->index - 1)) && 
+      $this->value <= $previousValue
    ) {
+      $this->message = "each successive value must be greater than the last";
       return false;
    }
    return true;
