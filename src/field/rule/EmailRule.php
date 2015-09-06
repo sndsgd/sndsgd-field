@@ -12,22 +12,21 @@ use \sndsgd\field\Error;
  */
 class EmailRule extends \sndsgd\field\Rule
 {
-   /**
-    * {@inheritdoc}
-    */
-   protected $message = 'invalid email address';
+    /**
+     * {@inheritdoc}
+     */
+    protected $message = 'invalid email address';
 
-   /**
-    * {@inheritdoc}
-    */
-   public function validate()
-   {
-      $result = filter_var($this->value, FILTER_VALIDATE_EMAIL);
-      if ($result !== false) {
-         $this->value = $result;
-         return true;
-      }
-      return false;
-   }
+    /**
+     * {@inheritdoc}
+     */
+    public function validate()
+    {
+        $result = filter_var($this->value, FILTER_VALIDATE_EMAIL);
+        if ($result !== false) {
+            $this->value = $result;
+            return true;
+        }
+        return false;
+    }
 }
-

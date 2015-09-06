@@ -8,35 +8,34 @@ namespace sndsgd\field;
  */
 class LongitudeFieldTest extends \PHPUnit_Framework_TestCase
 {
-   public function setUp()
-   {
-      $this->field = new LongitudeField("longitude");
-   }
+    public function setUp()
+    {
+        $this->field = new LongitudeField("longitude");
+    }
 
-   /**
-    * @covers ::setDefault
-    * @covers ::getDefault
-    */
-   public function testSetDefault()
-   {
-      $this->field->setDefault(42.4242);
-      $this->assertEquals(42.4242, $this->field->getDefault());
-   }
+    /**
+     * @covers ::setDefault
+     * @covers ::getDefault
+     */
+    public function testSetDefault()
+    {
+        $this->field->setDefault(42.4242);
+        $this->assertEquals(42.4242, $this->field->getDefault());
+    }
 
-   /**
-    * @expectedException InvalidArgumentException
-    */
-   public function testSetDefaultInvalidTypeException()
-   {
-      $this->field->setDefault("string");
-   }
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testSetDefaultInvalidTypeException()
+    {
+        $this->field->setDefault("string");
+    }
 
-   /**
-    * @expectedException InvalidArgumentException
-    */
-   public function testSetDefaultOutOfRangeException()
-   {
-      $this->field->setDefault(1000);
-   }
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testSetDefaultOutOfRangeException()
+    {
+        $this->field->setDefault(1000);
+    }
 }
-

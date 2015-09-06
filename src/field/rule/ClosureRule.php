@@ -15,68 +15,67 @@ use \sndsgd\field\Error;
  */
 class ClosureRule extends \sndsgd\field\Rule
 {
-   /**
-    * {@inheritdoc}
-    */
-   protected $message = "";
+    /**
+     * {@inheritdoc}
+     */
+    protected $message = "";
 
-   /**
-    * The handler function
-    *
-    * @var callable
-    */
-   protected $fn;
+    /**
+     * The handler function
+     *
+     * @var callable
+     */
+    protected $fn;
 
-   /**
-    * @param callable $handler A function/method to perform validation
-    */
-   public function __construct($handler = null)
-   {
-      if ($handler === null || !is_callable($handler)) {
-         throw new InvalidArgumentException(
-            "invalid value provided for 'handler'; ".
-            "expecting a closure"
-         );
-      }
-      if (!is_string($handler)) {
-         $handler = $handler->bindTo($this, $this);
-      }
-      $this->fn = $handler;
-   }
+    /**
+     * @param callable $handler A function/method to perform validation
+     */
+    public function __construct($handler = null)
+    {
+        if ($handler === null || !is_callable($handler)) {
+            throw new InvalidArgumentException(
+                "invalid value provided for 'handler'; ".
+                "expecting a closure"
+            );
+        }
+        if (!is_string($handler)) {
+            $handler = $handler->bindTo($this, $this);
+        }
+        $this->fn = $handler;
+    }
 
-   /**
-    * Ensure that multiple Closure rules can be added to a field
-    *
-    * @return string
-    */
-   public function getClass()
-   {
-      if (is_string($this->fn)) {
-         return $this->fn;
-      }
-      $hash = sha1(mt_rand().microtime(true));
-      return "sndsgd\\field\\rule\\Closure($hash)";
-   }
+    /**
+     * Ensure that multiple Closure rules can be added to a field
+     *
+     * @return string
+     */
+    public function getClass()
+    {
+        if (is_string($this->fn)) {
+            return $this->fn;
+        }
+        $hash = sha1(mt_rand().microtime(true));
+        return "sndsgd\\field\\rule\\Closure($hash)";
+    }
 
-   /**
-    * {@inheritdoc}
-    */
-   public function validate()
-   {
-      $result = call_user_func(
-         $this->fn, 
-         $this->value,
-         $this->valueIndex,
-         $this->field, 
-         $this->collection
-      );
+    /**
+     * {@inheritdoc}
+     */
+    public function validate()
+    {
+        $result = call_user_func(
+            $this->fn, 
+            $this->value,
+            $this->valueIndex,
+            $this->field, 
+            $this->collection
+        );
 
-      if (is_array($result)) {
-         $this->value = $result[1];
-         $result = $result[0];
-      }
+        if (is_array($result)) {
+            $this->value = $result[1];
+            $result = $result[0];
+        }
 
-      return $result;
-   }
+        return $result;
+    }
 }
-

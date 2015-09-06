@@ -1,31 +1,31 @@
 {
-   "name": "sndsgd/field",
-   "description": "Tools for handling user input with PHP",
-   "type": "library",
-   "homepage": "https://github.com/sndsgd/sndsgd-field",
-   "license": "MIT",
-   "authors": [
-      {
-         "name": "Russell B",
-         "homepage": "http://snds.gd/"
-      }
-   ],
-   "support": {
-      "issues": "https://github.com/sndsgd/sndsgd-field/issues",
-      "source": "https://github.com/sndsgd/sndsgd-field/tree/master"
-   },
-   "require": {
-      "php": ">=5.4.0",
-      "sndsgd/util": "~0.6",
-      "sndsgd/event": "~0.5"
-   },
-   "require-dev": {
-      "phpunit/phpunit": "~4.0",
-      "mikey179/vfsStream": "~1.4.0"
-   },
-   "autoload": {
-      "psr-4": {
-         "sndsgd\\": "src/"
-      }
-   }
+    "name": "sndsgd/field",
+    "description": "Tools for handling user input with PHP",
+    "type": "library",
+    "homepage": "https://github.com/sndsgd/sndsgd-field",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Russell B",
+            "homepage": "http://snds.gd/"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/sndsgd/sndsgd-field/issues",
+        "source": "https://github.com/sndsgd/sndsgd-field/tree/master"
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.4.0",
+        "sndsgd/util": "~0.7",
+        "sndsgd/event": "~0.5"
+    },
+    "require-dev": {
+        "mikey179/vfsStream": "~1.6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "sndsgd\\": "src/"
+        }
+    }
 }

@@ -11,19 +11,18 @@ use \sndsgd\field\rule\NotBoolean as NotBooleanRule;
  */
 class StringField extends \sndsgd\Field
 {
-   /**
-    * {@inheritdoc}
-    * @param string $value
-    */
-   public function setDefault($value)
-   {
-      if (!is_string($value)) {
-         throw new InvalidArgumentException(
-            "invalid value provided for 'value'; expecting a string"
-         );
-      }
-      $this->defaultValue = $value;
-      return $this;
-   }
+    /**
+     * {@inheritdoc}
+     * @param string $value
+     */
+    public function setDefault($value)
+    {
+        if (!is_string($value)) {
+            throw new InvalidArgumentException(
+                "invalid value provided for 'value'; expecting a string"
+            );
+        }
+        $this->defaultValue = $value;
+        return $this;
+    }
 }
-

@@ -7,17 +7,16 @@ use \sndsgd\field\rule\RequiredRule;
 
 class RequiredRuleTest extends \PHPUnit_Framework_TestCase
 {
-   public function testValidate()
-   {
-      $rule = new RequiredRule;
+    public function testValidate()
+    {
+        $rule = new RequiredRule;
 
-      $this->assertFalse($rule->validate());
+        $this->assertFalse($rule->validate());
 
-      $rule->setValue('');
-      $this->assertFalse($rule->validate());
+        $rule->setValue('');
+        $this->assertFalse($rule->validate());
 
-      $rule->setValue(1);
-      $this->assertTrue($rule->validate());
-   }
+        $rule->setValue(1);
+        $this->assertTrue($rule->validate());
+    }
 }
-

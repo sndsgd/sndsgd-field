@@ -12,17 +12,16 @@ use \sndsgd\field\Error;
  */
 class AlphaNumRule extends \sndsgd\field\Rule
 {
-   /**
-    * {@inheritdoc}
-    */
-   protected $message = 'contains non alphanumeric characters';
+    /**
+     * {@inheritdoc}
+     */
+    protected $message = 'contains non alphanumeric characters';
 
-   /**
-    * {@inheritdoc}
-    */
-   public function validate()
-   {
-      return ctype_alnum($this->value);
-   }
+    /**
+     * {@inheritdoc}
+     */
+    public function validate()
+    {
+        return ctype_alnum($this->value);
+    }
 }
-

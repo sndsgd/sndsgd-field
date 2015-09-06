@@ -12,21 +12,20 @@ use \sndsgd\field\Error;
  */
 class NumberRule extends \sndsgd\field\Rule
 {
-   /**
-    * {@inheritdoc}
-    */
-   protected $message = 'must be a number';
+    /**
+     * {@inheritdoc}
+     */
+    protected $message = 'must be a number';
 
-   /**
-    * {@inheritdoc}
-    */
-   public function validate()
-   {
-      if ($this->value === 0 || is_numeric($this->value)) {
-         $this->value = floatval($this->value);
-         return true;
-      }
-      return false;
-   }
+    /**
+     * {@inheritdoc}
+     */
+    public function validate()
+    {
+        if ($this->value === 0 || is_numeric($this->value)) {
+            $this->value = floatval($this->value);
+            return true;
+        }
+        return false;
+    }
 }
-

@@ -12,17 +12,16 @@ use \sndsgd\field\Error;
  */
 class RequiredRule extends \sndsgd\field\Rule
 {
-   /**
-    * {@inheritdoc}
-    */
-   protected $message = 'this is a required field';
+    /**
+     * {@inheritdoc}
+     */
+    protected $message = 'this is a required field';
 
-   /**
-    * {@inheritdoc}
-    */
-   public function validate()
-   {
-      return ($this->value !== null && $this->value !== '');
-   }
+    /**
+     * {@inheritdoc}
+     */
+    public function validate()
+    {
+        return ($this->value !== null && $this->value !== '');
+    }
 }
-

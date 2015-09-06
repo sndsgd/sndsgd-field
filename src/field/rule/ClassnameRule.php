@@ -13,24 +13,23 @@ use \sndsgd\Classname as Cname;
  */
 class ClassnameRule extends \sndsgd\field\Rule
 {
-   const REGEX = '/^(\\\\)?([a-z][a-z0-9_]+)((?:\\\\[a-z][a-z0-9_]+)+)?$/i';
+    const REGEX = '/^(\\\\)?([a-z][a-z0-9_]+)((?:\\\\[a-z][a-z0-9_]+)+)?$/i';
 
-   /**
-    * {@inheritdoc}
-    */
-   protected $message = 'invalid classname';
+    /**
+     * {@inheritdoc}
+     */
+    protected $message = 'invalid classname';
 
-   /**
-    * {@inheritdoc}
-    */
-   public function validate()
-   {
-      $classname = Cname::toString($this->value);
-      if (preg_match(self::REGEX, $classname) === 1) {
-         $this->value = $classname;
-         return true;
-      }
-      return false;
-   }
+    /**
+     * {@inheritdoc}
+     */
+    public function validate()
+    {
+        $classname = Cname::toString($this->value);
+        if (preg_match(self::REGEX, $classname) === 1) {
+            $this->value = $classname;
+            return true;
+        }
+        return false;
+    }
 }
-

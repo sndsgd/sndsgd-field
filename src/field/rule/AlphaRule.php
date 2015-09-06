@@ -12,17 +12,16 @@ use \sndsgd\field\Error;
  */
 class AlphaRule extends \sndsgd\field\Rule
 {
-   /**
-    * {@inheritdoc}
-    */
-   protected $message = 'contains non alphabetical characters';
+    /**
+     * {@inheritdoc}
+     */
+    protected $message = 'contains non alphabetical characters';
 
-   /**
-    * {@inheritdoc}
-    */
-   public function validate()
-   {
-      return ctype_alpha($this->value);
-   }
+    /**
+     * {@inheritdoc}
+     */
+    public function validate()
+    {
+        return ctype_alpha($this->value);
+    }
 }
-

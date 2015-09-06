@@ -14,17 +14,16 @@ use \sndsgd\field\Error;
  */
 class NotBooleanRule extends \sndsgd\field\Rule
 {
-   /**
-    * {@inheritdoc}
-    */
-   protected $message = 'missing required value';
+    /**
+     * {@inheritdoc}
+     */
+    protected $message = 'missing required value';
 
-   /**
-    * {@inheritdoc}
-    */
-   public function validate()
-   {
-      return is_bool($this->value) === false;
-   }
+    /**
+     * {@inheritdoc}
+     */
+    public function validate()
+    {
+        return is_bool($this->value) === false;
+    }
 }
-

@@ -18,42 +18,41 @@ use \sndsgd\Path;
  */
 class WritablePathRule extends \sndsgd\field\Rule
 {
-   /**
-    * Whether or not the provided path will be a directory
-    *
-    * @var boolean
-    */
-   protected $isDir = false;
+    /**
+     * Whether or not the provided path will be a directory
+     *
+     * @var boolean
+     */
+    protected $isDir = false;
 
-   /**
-    * @param boolean $isDir
-    */
-   public function __construct($isDir = false)
-   {
-      if (!is_bool($isDir)) {
-         throw new InvalidArgumentException(
-            "invalid value provided for 'isDir'; ".
-            "expecting a boolean"
-         );
-      }
-      $this->isDir = $isDir;
-   }
+    /**
+     * @param boolean $isDir
+     */
+    public function __construct($isDir = false)
+    {
+        if (!is_bool($isDir)) {
+            throw new InvalidArgumentException(
+                "invalid value provided for 'isDir'; ".
+                "expecting a boolean"
+            );
+        }
+        $this->isDir = $isDir;
+    }
 
-   /**
-    * {@inheritdoc}
-    */
-   public function validate()
-   {
-      $path = Path::normalize($this->value);
-      $test = ($this->isDir === true)
-         ? Dir::isWritable($path)
-         : File::isWritable($path);
-      if ($test === true) {
-         $this->value = $path;
-         return true;
-      }
-      $this->message = $test;
-      return false;
-   }
+    /**
+     * {@inheritdoc}
+     */
+    public function validate()
+    {
+        $path = Path::normalize($this->value);
+        $test = ($this->isDir === true)
+            ? Dir::isWritable($path)
+            : File::isWritable($path);
+        if ($test === true) {
+            $this->value = $path;
+            return true;
+        }
+        $this->message = $test;
+        return false;
+    }
 }
-
