@@ -17,8 +17,8 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.4.0",
-        "sndsgd/util": "~0.7",
-        "sndsgd/event": "~0.5"
+        "sndsgd/util": "~0.7.0",
+        "sndsgd/event": "~0.6.0"
     },
     "require-dev": {
         "mikey179/vfsStream": "~1.6.0"
